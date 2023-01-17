@@ -1,5 +1,8 @@
-import { partial } from "lodash-es";
+import { omit, partial } from "lodash-es";
 import { DefaultBodyType, MockedRequest, RestHandler } from "msw";
+import changePasswordHandler, {
+  ChangePasswordOptions,
+} from "./change-password";
 import confirmSignUpHandler, { ConfirmSignUpOptions } from "./confirm-sign-up";
 import { BaseEndpointOptions } from "./create-handler";
 import {
@@ -15,6 +18,7 @@ import resendConfirmationCodeHandler, {
 type Handler = RestHandler<MockedRequest<DefaultBodyType>>;
 
 type CognitoHandlersFactory = {
+  readonly changePasswordHandler: (options: ChangePasswordOptions) => Handler;
   readonly confirmSignUpHandler: (options: ConfirmSignUpOptions) => Handler;
   readonly resendConfirmationCodeHandler: (
     options: ResendConfirmationCodeOptions
@@ -31,6 +35,10 @@ function createCognitoHandlersFactory(
   baseOptions: BaseEndpointOptions
 ): CognitoHandlersFactory {
   return {
+    changePasswordHandler: partial(
+      changePasswordHandler,
+      omit(baseOptions, "userPoolClientId")
+    ),
     initiateAuthNonConfirmedUserSignInHandlers: partial(
       initiateAuthNonConfirmedUserSignInHandlers,
       baseOptions
