@@ -1,0 +1,54 @@
+{
+  "name": "@dhau/msw-aws-cognito",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "MSW handlers for AWS Cognito",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rm -rf",
+    "format": "prettier -w \"src/**/*.ts\"",
+    "format:check": "prettier -c \"src/**/*.ts\"",
+    "prebuild": "run-p format:check test:all",
+    "test": "mocha -w",
+    "test:all": "echo 'TODO: mocha'",
+    "build": "tsc --outDir dist",
+    "npm:publish": "npm publish --access public",
+    "deploy": "run-s clean build npm:publish"
+  },
+  "author": "Daniel Holmes",
+  "license": "MIT",
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/lodash-es": "^4.17.6",
+    "@types/mocha": "^10.0.1",
+    "amazon-cognito-identity-js": "^6.0.0",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "msw": "^0.49.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "peerDependencies": {
+    "amazon-cognito-identity-js": ">=6.0.0",
+    "msw": ">=0.27.0"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  }
+}
