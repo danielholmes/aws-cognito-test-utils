@@ -5,6 +5,8 @@ import { BaseEndpointOptions } from "./create-handler";
 import {
   initiateAuthNewPasswordRequiredHandlers,
   InitiateAuthNewPasswordRequiredOptions,
+  InitiateAuthNonConfirmedUserSignInHandlers,
+  initiateAuthNonConfirmedUserSignInHandlers,
 } from "./initiate-auth";
 import resendConfirmationCodeHandler, {
   ResendConfirmationCodeOptions,
@@ -17,6 +19,9 @@ type CognitoHandlersFactory = {
   readonly resendConfirmationCodeHandler: (
     options: ResendConfirmationCodeOptions
   ) => Handler;
+  readonly initiateAuthNonConfirmedUserSignInHandlers: (
+    options: InitiateAuthNonConfirmedUserSignInHandlers
+  ) => ReadonlyArray<Handler>;
   readonly initiateAuthNewPasswordRequiredHandlers: (
     options: InitiateAuthNewPasswordRequiredOptions
   ) => ReadonlyArray<Handler>;
@@ -26,6 +31,10 @@ function createCognitoHandlersFactory(
   baseOptions: BaseEndpointOptions
 ): CognitoHandlersFactory {
   return {
+    initiateAuthNonConfirmedUserSignInHandlers: partial(
+      initiateAuthNonConfirmedUserSignInHandlers,
+      baseOptions
+    ),
     initiateAuthNewPasswordRequiredHandlers: partial(
       initiateAuthNewPasswordRequiredHandlers,
       baseOptions
