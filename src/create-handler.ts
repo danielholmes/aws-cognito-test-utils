@@ -13,8 +13,11 @@ type CognitoPostOptions<
   Partial<Pick<BaseEndpointOptions, "userPoolClientId">> & {
     readonly target: string;
     readonly bodyMatcher?: Record<string, unknown>;
-    readonly successResponse: ResponseBody;
-    readonly onSuccess?: () => void;
+    readonly matchResponse: {
+      readonly status: number;
+      readonly body: ResponseBody;
+    };
+    readonly onCalled?: () => void;
   };
 
 function createCognitoPostHandler<
@@ -25,8 +28,8 @@ function createCognitoPostHandler<
   userPoolClientId,
   target,
   bodyMatcher,
-  onSuccess,
-  successResponse,
+  onCalled,
+  matchResponse,
 }: CognitoPostOptions<Params, ResponseBody>) {
   return rest.post<DefaultBodyType, Params, ResponseBody>(
     `https://cognito-idp.${region}.amazonaws.com/`,
@@ -45,13 +48,16 @@ function createCognitoPostHandler<
         return undefined;
       }
 
-      if (onSuccess) {
-        onSuccess();
+      if (onCalled) {
+        onCalled();
       }
-      return res(ctx.json(successResponse));
+      return res(
+        ctx.status(matchResponse.status),
+        ctx.json(matchResponse.body)
+      );
     }
   );
 }
 
-export type { BaseEndpointOptions };
+export type { BaseEndpointOptions, CognitoPostOptions };
 export { createCognitoPostHandler };
