@@ -1,7 +1,7 @@
 import { isMatch } from "lodash-es";
 import { DefaultBodyType, PathParams, rest } from "msw";
 
-type BaseOptions = {
+type BaseEndpointOptions = {
   readonly region: string;
   readonly userPoolClientId: string;
 };
@@ -9,8 +9,8 @@ type BaseOptions = {
 type CognitoPostOptions<
   Params extends PathParams<keyof Params> = PathParams<string>,
   ResponseBody extends DefaultBodyType = DefaultBodyType
-> = Omit<BaseOptions, "userPoolClientId"> &
-  Partial<Pick<BaseOptions, "userPoolClientId">> & {
+> = Omit<BaseEndpointOptions, "userPoolClientId"> &
+  Partial<Pick<BaseEndpointOptions, "userPoolClientId">> & {
     readonly target: string;
     readonly bodyMatcher?: Record<string, unknown>;
     readonly successResponse: ResponseBody;
@@ -53,4 +53,5 @@ function createCognitoPostHandler<
   );
 }
 
+export type { BaseEndpointOptions };
 export { createCognitoPostHandler };
