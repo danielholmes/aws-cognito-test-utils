@@ -1,6 +1,6 @@
 {
   "name": "@dhau/msw-aws-cognito",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "main": "./dist/index.js",
@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rm -rf",
+    "clean": "rm -rf dist",
     "format": "prettier -w \"src/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
     "prebuild": "run-p format:check test:all",
