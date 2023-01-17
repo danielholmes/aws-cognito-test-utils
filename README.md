@@ -1,4 +1,6 @@
-# Dhau MSW AWS Cognito
+# MSW AWS Cognito
+
+[![Test](https://github.com/danielholmes/dhau-msw-aws-cognito/actions/workflows/test.yml/badge.svg)](https://github.com/danielholmes/dhau-msw-aws-cognito/actions/workflows/test.yml)
 
 MSW handlers for AWS Cognito.
 
