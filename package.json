@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "format:fix": "prettier -w \"src/**/*.ts\"",
+    "format": "prettier -w \"src/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
     "prebuild": "run-p format:check test:all",
     "test": "mocha -w",

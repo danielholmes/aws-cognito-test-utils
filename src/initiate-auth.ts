@@ -63,13 +63,13 @@ function initiateAuthNewPasswordRequiredHandlers(
   ];
 }
 
-type initiateAuthNonConfirmedUserSignInHandlers = {
+type InitiateAuthNonConfirmedUserSignInHandlers = {
   readonly username: string;
 };
 
 function initiateAuthNonConfirmedUserSignInHandlers(
   baseOptions: BaseEndpointOptions,
-  { username }: initiateAuthNonConfirmedUserSignInHandlers
+  { username }: InitiateAuthNonConfirmedUserSignInHandlers
 ) {
   return [
     createCognitoPostHandler({
@@ -115,7 +115,10 @@ function initiateAuthNonConfirmedUserSignInHandlers(
   ];
 }
 
-export type { InitiateAuthNewPasswordRequiredOptions, c };
+export type {
+  InitiateAuthNewPasswordRequiredOptions,
+  InitiateAuthNonConfirmedUserSignInHandlers,
+};
 export {
   initiateAuthNonConfirmedUserSignInHandlers,
   initiateAuthNewPasswordRequiredHandlers,
