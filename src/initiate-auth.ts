@@ -1,18 +1,17 @@
-import {
-  BaseEndpointOptions,
-  createCognitoPostHandler,
-} from "./create-handler";
+import { RestHandlersFactory } from "@dhau/msw-builders";
+import { BaseHandlerOptions, createCognitoPostHandler } from "./create-handler";
 
 type InitiateAuthNewPasswordRequiredOptions = {
   readonly email: string;
 };
 
 function initiateAuthNewPasswordRequiredHandlers(
-  baseOptions: BaseEndpointOptions,
+  factory: RestHandlersFactory,
+  baseOptions: BaseHandlerOptions,
   { email }: InitiateAuthNewPasswordRequiredOptions
 ) {
   return [
-    createCognitoPostHandler({
+    createCognitoPostHandler(factory, {
       ...baseOptions,
       target: "AWSCognitoIdentityProviderService.InitiateAuth",
       // TODO: Don't know what to check for pw
@@ -36,7 +35,7 @@ function initiateAuthNewPasswordRequiredHandlers(
         },
       },
     }),
-    createCognitoPostHandler({
+    createCognitoPostHandler(factory, {
       ...baseOptions,
       target: "AWSCognitoIdentityProviderService.RespondToAuthChallenge",
       bodyMatcher: {
@@ -68,11 +67,12 @@ type InitiateAuthNonConfirmedUserSignInHandlers = {
 };
 
 function initiateAuthNonConfirmedUserSignInHandlers(
-  baseOptions: BaseEndpointOptions,
+  factory: RestHandlersFactory,
+  baseOptions: BaseHandlerOptions,
   { username }: InitiateAuthNonConfirmedUserSignInHandlers
 ) {
   return [
-    createCognitoPostHandler({
+    createCognitoPostHandler(factory, {
       ...baseOptions,
       target: "AWSCognitoIdentityProviderService.InitiateAuth",
       bodyMatcher: {
@@ -95,7 +95,7 @@ function initiateAuthNonConfirmedUserSignInHandlers(
         },
       },
     }),
-    createCognitoPostHandler({
+    createCognitoPostHandler(factory, {
       ...baseOptions,
       target: "AWSCognitoIdentityProviderService.RespondToAuthChallenge",
       bodyMatcher: {

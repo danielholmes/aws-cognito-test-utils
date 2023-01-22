@@ -1,18 +1,19 @@
+import { RestHandlersFactory } from "@dhau/msw-builders";
+import { DefaultBodyType, PathParams } from "msw";
 import { isMatch } from "lodash-es";
-import { DefaultBodyType, PathParams, rest } from "msw";
 
-type BaseEndpointOptions = {
-  readonly region: string;
+type BaseHandlerOptions = {
   readonly userPoolClientId: string;
 };
 
 type CognitoPostOptions<
   Params extends PathParams<keyof Params> = PathParams<string>,
+  RequestBody extends Record<string, unknown> = Record<string, unknown>,
   ResponseBody extends DefaultBodyType = DefaultBodyType
-> = Omit<BaseEndpointOptions, "userPoolClientId"> &
-  Partial<Pick<BaseEndpointOptions, "userPoolClientId">> & {
+> = Omit<BaseHandlerOptions, "userPoolClientId"> &
+  Partial<Pick<BaseHandlerOptions, "userPoolClientId">> & {
     readonly target: string;
-    readonly bodyMatcher?: Record<string, unknown>;
+    readonly bodyMatcher?: RequestBody;
     readonly matchResponse: {
       readonly status: number;
       readonly body: ResponseBody;
@@ -21,43 +22,43 @@ type CognitoPostOptions<
   };
 
 function createCognitoPostHandler<
+  TSearchParams extends Record<string, string>,
   Params extends PathParams<keyof Params> = PathParams<string>,
+  RequestBody extends Record<string, unknown> = Record<string, unknown>,
   ResponseBody extends DefaultBodyType = DefaultBodyType
->({
-  region,
-  userPoolClientId,
-  target,
-  bodyMatcher,
-  onCalled,
-  matchResponse,
-}: CognitoPostOptions<Params, ResponseBody>) {
-  return rest.post<DefaultBodyType, Params, ResponseBody>(
-    `https://cognito-idp.${region}.amazonaws.com/`,
-    (req, res, ctx) => {
-      if (req.headers.get("x-amz-target") !== target) {
-        return undefined;
-      }
-
-      const body: Record<string, unknown> =
-        typeof req.body === "object" && req.body ? req.body : {};
-      if (!!userPoolClientId && body.ClientId !== userPoolClientId) {
-        return undefined;
-      }
-
-      if (bodyMatcher && !isMatch(body, bodyMatcher)) {
-        return undefined;
-      }
-
-      if (onCalled) {
-        onCalled();
-      }
-      return res(
-        ctx.status(matchResponse.status),
-        ctx.json(matchResponse.body)
-      );
-    }
+>(
+  factory: RestHandlersFactory,
+  {
+    userPoolClientId,
+    target,
+    bodyMatcher,
+    matchResponse,
+    onCalled,
+  }: CognitoPostOptions<Params, RequestBody, ResponseBody>
+) {
+  return factory.post<
+    TSearchParams,
+    { "x-amz-target": string },
+    RequestBody & { readonly ClientId?: string },
+    Params,
+    ResponseBody
+  >(
+    "",
+    {
+      headers: (v) =>
+        isMatch(v, {
+          "x-amz-target": target,
+        }),
+      body: {
+        ...(userPoolClientId ? { ClientId: userPoolClientId } : {}),
+        ...bodyMatcher,
+      } as any,
+    },
+    (_, res, ctx) =>
+      res(ctx.status(matchResponse.status), ctx.json(matchResponse.body)),
+    { onCalled }
   );
 }
 
-export type { BaseEndpointOptions, CognitoPostOptions };
+export type { BaseHandlerOptions, CognitoPostOptions };
 export { createCognitoPostHandler };

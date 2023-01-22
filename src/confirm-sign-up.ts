@@ -1,6 +1,7 @@
+import { RestHandlersFactory } from "@dhau/msw-builders";
 import {
-  BaseEndpointOptions,
   CognitoPostOptions,
+  BaseHandlerOptions,
   createCognitoPostHandler,
 } from "./create-handler";
 
@@ -10,10 +11,11 @@ type ConfirmSignUpOptions = Pick<CognitoPostOptions, "onCalled"> & {
 };
 
 function confirmSignUpHandler(
-  baseOptions: BaseEndpointOptions,
+  factory: RestHandlersFactory,
+  baseOptions: BaseHandlerOptions,
   { username, code, ...rest }: ConfirmSignUpOptions
 ) {
-  return createCognitoPostHandler({
+  return createCognitoPostHandler(factory, {
     ...baseOptions,
     ...rest,
     target: "AWSCognitoIdentityProviderService.ConfirmSignUp",

@@ -1,6 +1,6 @@
 {
   "name": "@dhau/msw-aws-cognito",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "main": "./dist/index.js",
@@ -33,6 +33,7 @@
   "author": "Daniel Holmes",
   "license": "MIT",
   "dependencies": {
+    "@dhau/msw-builders": "^0.0.4",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

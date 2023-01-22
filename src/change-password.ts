@@ -1,8 +1,5 @@
-import {
-  BaseEndpointOptions,
-  CognitoPostOptions,
-  createCognitoPostHandler,
-} from "./create-handler";
+import { RestHandlersFactory } from "@dhau/msw-builders";
+import { CognitoPostOptions, createCognitoPostHandler } from "./create-handler";
 
 type ChangePasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
   readonly previousPassword: string;
@@ -12,7 +9,7 @@ type ChangePasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
 };
 
 function changePasswordHandler(
-  baseOptions: Omit<BaseEndpointOptions, "userPoolClientId">,
+  factory: RestHandlersFactory,
   {
     previousPassword,
     proposedPassword,
@@ -21,8 +18,7 @@ function changePasswordHandler(
     ...rest
   }: ChangePasswordOptions
 ) {
-  return createCognitoPostHandler({
-    ...baseOptions,
+  return createCognitoPostHandler(factory, {
     ...rest,
     target: "AWSCognitoIdentityProviderService.ChangePassword",
     bodyMatcher: {
