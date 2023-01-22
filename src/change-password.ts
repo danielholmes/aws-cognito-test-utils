@@ -8,6 +8,7 @@ type ChangePasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
   readonly previousPassword: string;
   readonly proposedPassword: string;
   readonly accessToken: string;
+  readonly clientMetadata?: Record<string, string>;
 };
 
 function changePasswordHandler(
@@ -16,6 +17,7 @@ function changePasswordHandler(
     previousPassword,
     proposedPassword,
     accessToken,
+    clientMetadata,
     ...rest
   }: ChangePasswordOptions
 ) {
@@ -27,6 +29,7 @@ function changePasswordHandler(
       PreviousPassword: previousPassword,
       ProposedPassword: proposedPassword,
       AccessToken: accessToken,
+      ClientMetadata: clientMetadata,
     },
     matchResponse: {
       status: 200,
