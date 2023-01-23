@@ -1,13 +1,13 @@
-# MSW AWS Cognito
+# AWS Cognito Test Utils
 
-[![Test](https://github.com/danielholmes/dhau-msw-aws-cognito/actions/workflows/test.yml/badge.svg)](https://github.com/danielholmes/dhau-msw-aws-cognito/actions/workflows/test.yml)
+[![Test](https://github.com/danielholmes/dhau-aws-cognito-test-utils/actions/workflows/test.yml/badge.svg)](https://github.com/danielholmes/dhau-aws-cognito-test-utils/actions/workflows/test.yml)
 
-MSW handlers for AWS Cognito.
+MSW handlers and other utilities for integration tests with AWS Cognito.
 
 ## Installation
 
 ```
-npm add @dhau/msw-aws-cognito
+npm add @dhau/aws-cognito-test-utils
 ```
 
 ## Local Development

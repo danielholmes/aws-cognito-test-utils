@@ -1,6 +1,6 @@
 {
-  "name": "@dhau/msw-aws-cognito",
-  "version": "0.0.11",
+  "name": "@dhau/aws-cognito-test-utils",
+  "version": "0.0.1",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "main": "./dist/index.js",
@@ -21,7 +21,8 @@
     "clean": "rm -rf dist",
     "format": "prettier -w \"src/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
-    "prebuild": "run-p format:check test:all",
+    "ts": "tsc -p tsconfig.esm.json --noEmit",
+    "prebuild": "run-p format:check test:all ts",
     "test": "mocha -w",
     "test:all": "echo 'TODO: mocha'",
     "build:esm": "rollup --config rollup.config.js",
