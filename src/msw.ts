@@ -8,6 +8,7 @@ import {
   initiateAuthNonConfirmedUserSignInHandlers,
 } from "./initiate-auth";
 import resendConfirmationCodeHandler from "./resend-confirmation-code";
+import { createCognitoBaseUrl } from "./utils";
 
 type Options = BaseHandlerOptions & {
   readonly region: string;
@@ -20,7 +21,7 @@ function createCognitoHandlersFactory({
   ...baseOptions
 }: Options) {
   const builders = createRestHandlersFactory({
-    url: `https://cognito-idp.${region}.amazonaws.com`,
+    url: createCognitoBaseUrl(region),
     debug,
   });
   return {

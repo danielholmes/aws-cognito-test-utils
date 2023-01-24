@@ -1,3 +1,5 @@
+import { createCognitoBaseUrl } from "./utils";
+
 function encodeToken(first: Record<string, any>, second: Record<string, any>) {
   return [first, second]
     .map((c) => Buffer.from(JSON.stringify(c)).toString("base64"))
@@ -32,6 +34,7 @@ function createUserTokensForDate(
   date: Date
 ): UserTokens {
   const dateSecs = Math.floor(date.getTime() / 1000);
+  const cognitoBaseUrl = createCognitoBaseUrl(region);
 
   return {
     id: encodeToken(
@@ -42,7 +45,7 @@ function createUserTokensForDate(
       {
         sub: userId,
         email_verified: emailVerified,
-        iss: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
+        iss: `${cognitoBaseUrl}/${userPoolId}`,
         "cognito:username": userId,
         origin_jti: "1b2d2e93-f60b-40f6-b2d0-57266e6c6483",
         aud: "uep8k61j1p5fahv8jon0e70qs",
@@ -63,7 +66,7 @@ function createUserTokensForDate(
       },
       {
         sub: userId,
-        iss: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
+        iss: `${cognitoBaseUrl}/${userPoolId}`,
         client_id: "uep8k61j1p5fahv8jon0e70qs",
         origin_jti: "1b2d2e93-f60b-40f6-b2d0-57266e6c6483",
         event_id: "84db83da-0c18-448f-b2c2-061574d192ea",
