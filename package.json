@@ -29,7 +29,8 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build": "npm-run-all -s clean -p build:*",
     "npm:publish": "npm publish --access public",
-    "deploy": "run-s build npm:publish"
+    "deploy": "run-s build npm:publish",
+    "prepare": "husky install"
   },
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -44,6 +45,8 @@
     "@types/mocha": "^10.0.1",
     "amazon-cognito-identity-js": "^6.0.0",
     "chai": "^4.3.7",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
     "mocha": "^10.2.0",
     "msw": "^0.49.0",
     "npm-run-all": "^4.1.5",
