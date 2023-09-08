@@ -1,0 +1,5 @@
+[*.ts]
+indent_style = tab
+
+[*.tsx]
+indent_style = tab
