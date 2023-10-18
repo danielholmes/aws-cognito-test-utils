@@ -1,5 +1,5 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import { DefaultBodyType, PathParams } from "msw";
+import { DefaultBodyType, HttpResponse, PathParams } from "msw";
 import { isMatch } from "lodash-es";
 
 type BaseHandlerOptions = {
@@ -56,8 +56,10 @@ function createCognitoPostHandler<
 				...bodyMatcher,
 			} as any,
 		},
-		(_, res, ctx) =>
-			res(ctx.status(matchResponse.status), ctx.json(matchResponse.body)),
+		() =>
+			HttpResponse.json(matchResponse.body, {
+				status: matchResponse.status,
+			}) as any,
 		{ onCalled },
 	);
 }

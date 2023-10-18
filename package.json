@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "sideEffects": false,
@@ -23,10 +23,8 @@
     "format": "prettier -w \"src/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
     "ts": "tsc -p tsconfig.esm.json --noEmit",
-    "prebuild": "run-p format:check test:all ts",
+    "prebuild": "run-p format:check ts",
     "postbuild": "./scripts/cjs-extensions.sh",
-    "test": "mocha -w",
-    "test:all": "echo 'TODO: mocha'",
     "build:esm": "rollup --config rollup.config.js",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build": "npm-run-all -s clean -p build:*",
@@ -37,28 +35,25 @@
   "author": "Daniel Holmes",
   "license": "MIT",
   "dependencies": {
-    "@dhau/msw-builders": "^0.0.15",
+    "@dhau/msw-builders": "^0.0.16",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/chai": "^4.3.4",
+    "@rollup/plugin-typescript": "^11.1.5",
     "@types/lodash-es": "^4.17.6",
-    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.8.6",
     "amazon-cognito-identity-js": "^6.0.0",
-    "chai": "^4.3.7",
     "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
-    "mocha": "^10.2.0",
-    "msw": "^1.3.0",
+    "lint-staged": "^15.0.1",
+    "msw": ">=0.0.0-fetch.rc-23",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
-    "rollup": "^3.10.0",
+    "rollup": "^4.1.4",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
     "amazon-cognito-identity-js": ">=6.0.0",
-    "msw": ">=0.27.0"
+    "msw": ">=0.0.0-fetch.rc-23"
   },
   "engines": {
     "node": ">=16.0.0"
