@@ -27,7 +27,7 @@ function changePasswordHandler(
 				PreviousPassword: previousPassword,
 				ProposedPassword: proposedPassword,
 				AccessToken: accessToken,
-				ClientMetadata: clientMetadata,
+				...(clientMetadata ? { ClientMetadata: clientMetadata } : {}),
 			}),
 		matchResponse: {
 			status: 200,
