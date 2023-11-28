@@ -1,3 +1,4 @@
+import { isMatch } from "lodash-es";
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import {
 	BaseHandlerOptions,
@@ -18,9 +19,10 @@ function resendConfirmationCodeHandler(
 		...baseOptions,
 		...rest,
 		target: "AWSCognitoIdentityProviderService.ResendConfirmationCode",
-		bodyMatcher: {
-			Username: username,
-		},
+		bodyMatcher: (b) =>
+			isMatch(b, {
+				Username: username,
+			}),
 		matchResponse: {
 			status: 200,
 			body: {},

@@ -13,7 +13,7 @@ type CognitoPostOptions<
 > = Omit<BaseHandlerOptions, "userPoolClientId"> &
 	Partial<Pick<BaseHandlerOptions, "userPoolClientId">> & {
 		readonly target: string;
-		readonly bodyMatcher?: RequestBody;
+		readonly bodyMatcher?: RequestBody | ((body: RequestBody) => boolean);
 		readonly matchResponse: {
 			readonly status: number;
 			readonly body: ResponseBody;
@@ -36,6 +36,9 @@ function createCognitoPostHandler<
 		onCalled,
 	}: CognitoPostOptions<Params, RequestBody, ResponseBody>,
 ) {
+	const partialBodyMatch = userPoolClientId
+		? { ClientId: userPoolClientId }
+		: {};
 	return factory.post<
 		TSearchParams,
 		{ "x-amz-target": string },
@@ -51,10 +54,13 @@ function createCognitoPostHandler<
 				isMatch(v, {
 					"x-amz-target": target,
 				}),
-			body: {
-				...(userPoolClientId ? { ClientId: userPoolClientId } : {}),
-				...bodyMatcher,
-			} as any,
+			body:
+				typeof bodyMatcher === "function"
+					? (b: any) => isMatch(b, partialBodyMatch) && bodyMatcher(b)
+					: ({
+							...partialBodyMatch,
+							...bodyMatcher,
+					  } as any),
 		},
 		() =>
 			HttpResponse.json(matchResponse.body, {

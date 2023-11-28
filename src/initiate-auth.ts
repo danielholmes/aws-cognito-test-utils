@@ -1,5 +1,6 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { BaseHandlerOptions, createCognitoPostHandler } from "./create-handler";
+import { isMatch } from "lodash-es";
 
 type InitiateAuthNewPasswordRequiredOptions = {
 	readonly email: string;
@@ -15,11 +16,11 @@ function initiateAuthNewPasswordRequiredHandlers(
 			...baseOptions,
 			target: "AWSCognitoIdentityProviderService.InitiateAuth",
 			// TODO: Don't know what to check for pw
-			bodyMatcher: {
-				AuthFlow: "USER_SRP_AUTH",
-				AuthParameters: {
-					USERNAME: email,
-				},
+			bodyMatcher: (b) => {
+				return isMatch(b, {
+					AuthFlow: "USER_SRP_AUTH",
+					AuthParameters: { USERNAME: email },
+				});
 			},
 			matchResponse: {
 				status: 200,
@@ -38,11 +39,13 @@ function initiateAuthNewPasswordRequiredHandlers(
 		createCognitoPostHandler(factory, {
 			...baseOptions,
 			target: "AWSCognitoIdentityProviderService.RespondToAuthChallenge",
-			bodyMatcher: {
-				ChallengeName: "PASSWORD_VERIFIER",
-				ChallengeResponses: {
-					USERNAME: "newUsername",
-				},
+			bodyMatcher: (b) => {
+				return isMatch(b, {
+					ChallengeName: "PASSWORD_VERIFIER",
+					ChallengeResponses: {
+						USERNAME: "newUsername",
+					},
+				});
 			},
 			matchResponse: {
 				status: 200,
@@ -75,11 +78,13 @@ function initiateAuthNonConfirmedUserSignInHandlers(
 		createCognitoPostHandler(factory, {
 			...baseOptions,
 			target: "AWSCognitoIdentityProviderService.InitiateAuth",
-			bodyMatcher: {
-				AuthFlow: "USER_SRP_AUTH",
-				AuthParameters: {
-					USERNAME: username,
-				},
+			bodyMatcher: (b) => {
+				return isMatch(b, {
+					AuthFlow: "USER_SRP_AUTH",
+					AuthParameters: {
+						USERNAME: username,
+					},
+				});
 			},
 			matchResponse: {
 				status: 200,
@@ -98,11 +103,13 @@ function initiateAuthNonConfirmedUserSignInHandlers(
 		createCognitoPostHandler(factory, {
 			...baseOptions,
 			target: "AWSCognitoIdentityProviderService.RespondToAuthChallenge",
-			bodyMatcher: {
-				ChallengeName: "PASSWORD_VERIFIER",
-				ChallengeResponses: {
-					USERNAME: "newUsername",
-				},
+			bodyMatcher: (body) => {
+				return isMatch(body, {
+					ChallengeName: "PASSWORD_VERIFIER",
+					ChallengeResponses: {
+						USERNAME: "newUsername",
+					},
+				});
 			},
 			matchResponse: {
 				status: 400,

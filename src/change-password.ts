@@ -1,3 +1,4 @@
+import { isMatch } from "lodash-es";
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { CognitoPostOptions, createCognitoPostHandler } from "./create-handler";
 
@@ -21,12 +22,13 @@ function changePasswordHandler(
 	return createCognitoPostHandler(factory, {
 		...rest,
 		target: "AWSCognitoIdentityProviderService.ChangePassword",
-		bodyMatcher: {
-			PreviousPassword: previousPassword,
-			ProposedPassword: proposedPassword,
-			AccessToken: accessToken,
-			ClientMetadata: clientMetadata,
-		},
+		bodyMatcher: (b) =>
+			isMatch(b, {
+				PreviousPassword: previousPassword,
+				ProposedPassword: proposedPassword,
+				AccessToken: accessToken,
+				ClientMetadata: clientMetadata,
+			}),
 		matchResponse: {
 			status: 200,
 			body: {},

@@ -1,3 +1,4 @@
+import { isMatch } from "lodash-es";
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import {
 	CognitoPostOptions,
@@ -19,10 +20,11 @@ function confirmSignUpHandler(
 		...baseOptions,
 		...rest,
 		target: "AWSCognitoIdentityProviderService.ConfirmSignUp",
-		bodyMatcher: {
-			Username: username,
-			ConfirmationCode: code,
-		},
+		bodyMatcher: (b) =>
+			isMatch(b, {
+				Username: username,
+				ConfirmationCode: code,
+			}),
 		matchResponse: {
 			status: 200,
 			body: {},
