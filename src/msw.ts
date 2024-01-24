@@ -9,6 +9,7 @@ import {
 } from "./initiate-auth";
 import resendConfirmationCodeHandler from "./resend-confirmation-code";
 import { createCognitoBaseUrl } from "./utils";
+import signUpHandler from "./sign-up";
 
 type Options = BaseHandlerOptions & {
 	readonly region: string;
@@ -36,6 +37,7 @@ function createCognitoHandlersFactory({
 			builders,
 			baseOptions,
 		),
+		signUpHandler: partial(signUpHandler, builders, baseOptions),
 		confirmSignUpHandler: partial(confirmSignUpHandler, builders, baseOptions),
 		resendConfirmationCodeHandler: partial(
 			resendConfirmationCodeHandler,

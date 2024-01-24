@@ -60,7 +60,7 @@ function createCognitoPostHandler<
 					: ({
 							...partialBodyMatch,
 							...bodyMatcher,
-					  } as any),
+						} as any),
 		},
 		() =>
 			HttpResponse.json(matchResponse.body, {
