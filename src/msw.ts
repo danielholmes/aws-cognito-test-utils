@@ -11,6 +11,7 @@ import {
 import resendConfirmationCodeHandler from "./resend-confirmation-code";
 import { createCognitoBaseUrl } from "./utils";
 import signUpHandler from "./sign-up";
+import getUserHandler from "./get-user";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -43,6 +44,7 @@ function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
 		),
 		signUpHandler: partial(signUpHandler, builders, baseOptions),
 		confirmSignUpHandler: partial(confirmSignUpHandler, builders, baseOptions),
+		getUserHandler: partial(getUserHandler, builders, baseOptions),
 		resendConfirmationCodeHandler: partial(
 			resendConfirmationCodeHandler,
 			builders,
