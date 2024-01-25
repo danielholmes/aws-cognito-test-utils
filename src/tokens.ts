@@ -39,6 +39,15 @@ function createUserTokensForDate(
 ): UserTokens {
 	const dateSecs = Math.floor(date.getTime() / 1000);
 	const cognitoBaseUrl = createCognitoBaseUrl(region);
+	const tokenCommonProps = {
+		iss: `${cognitoBaseUrl}/${userPoolId}`,
+		sub: userId,
+		auth_time: dateSecs,
+		iat: dateSecs,
+		exp: dateSecs + 999999,
+		origin_jti: "1b2d2e93-f60b-40f6-b2d0-57266e6c6483",
+		event_id: "84db83da-0c18-448f-b2c2-061574d192ea",
+	};
 
 	return {
 		id: encodeToken(
@@ -47,19 +56,13 @@ function createUserTokensForDate(
 				alg: "RS256",
 			},
 			{
-				sub: userId,
 				email_verified: emailVerified,
-				iss: `${cognitoBaseUrl}/${userPoolId}`,
 				"cognito:username": userId,
-				origin_jti: "1b2d2e93-f60b-40f6-b2d0-57266e6c6483",
 				aud: "uep8k61j1p5fahv8jon0e70qs",
-				event_id: "84db83da-0c18-448f-b2c2-061574d192ea",
 				token_use: "id",
-				auth_time: dateSecs,
-				iat: dateSecs,
-				exp: dateSecs + 999999,
 				jti: "f704dca1-7ca2-4ce9-9321-8e9f174ecc63",
 				email,
+				...tokenCommonProps,
 			},
 		),
 		refresh: "refresh-123",
@@ -69,18 +72,12 @@ function createUserTokensForDate(
 				alg: "RS256",
 			},
 			{
-				sub: userId,
-				iss: `${cognitoBaseUrl}/${userPoolId}`,
 				client_id: "uep8k61j1p5fahv8jon0e70qs",
-				origin_jti: "1b2d2e93-f60b-40f6-b2d0-57266e6c6483",
-				event_id: "84db83da-0c18-448f-b2c2-061574d192ea",
 				token_use: "access",
 				scope: "aws.cognito.signin.user.admin",
-				auth_time: dateSecs,
-				exp: dateSecs + 999999,
-				iat: dateSecs + 999999,
 				jti: "2f938ed4-c432-4430-b3c1-bb817c61df10",
 				username: userId,
+				...tokenCommonProps,
 			},
 		),
 		userData: JSON.stringify({
