@@ -1,7 +1,11 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { isMatch } from "lodash-es";
 import { createUserTokensForNow } from "./tokens";
-import { BaseHandlerOptions, createCognitoPostHandler } from "./create-handler";
+import {
+	BaseHandlerOptions,
+	CognitoPostOptions,
+	createCognitoPostHandler,
+} from "./create-handler";
 
 type InitiateAuthNewPasswordRequiredOptions = {
 	readonly email: string;
@@ -128,14 +132,17 @@ type InitiateAuthSuccessHandlerOptions = BaseHandlerOptions & {
 	readonly userPoolId: string;
 };
 
-type InitiateAuthSuccessUserSignInHandlers = {
+type InitiateAuthSuccessUserSignInOptions = Pick<
+	CognitoPostOptions,
+	"onCalled"
+> & {
 	readonly username: string;
 };
 
 function initiateAuthSuccessUserSignInHandlers(
 	factory: RestHandlersFactory,
 	{ region, userPoolId, ...baseOptions }: InitiateAuthSuccessHandlerOptions,
-	{ username }: InitiateAuthSuccessUserSignInHandlers,
+	{ username, ...rest }: InitiateAuthSuccessUserSignInOptions,
 ) {
 	const tokens = createUserTokensForNow({
 		region,
@@ -147,6 +154,7 @@ function initiateAuthSuccessUserSignInHandlers(
 	return [
 		createCognitoPostHandler(factory, {
 			...baseOptions,
+			...rest,
 			target: "AWSCognitoIdentityProviderService.InitiateAuth",
 			bodyMatcher: (b) => {
 				return isMatch(b, {
@@ -200,7 +208,7 @@ function initiateAuthSuccessUserSignInHandlers(
 export type {
 	InitiateAuthNewPasswordRequiredOptions,
 	InitiateAuthNonConfirmedUserSignInHandlers,
-	InitiateAuthSuccessUserSignInHandlers,
+	InitiateAuthSuccessUserSignInOptions,
 };
 export {
 	initiateAuthSuccessUserSignInHandlers,
