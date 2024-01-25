@@ -1,6 +1,7 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import { BaseHandlerOptions, createCognitoPostHandler } from "./create-handler";
 import { isMatch } from "lodash-es";
+import { createUserTokensForNow } from "./tokens";
+import { BaseHandlerOptions, createCognitoPostHandler } from "./create-handler";
 
 type InitiateAuthNewPasswordRequiredOptions = {
 	readonly email: string;
@@ -122,11 +123,87 @@ function initiateAuthNonConfirmedUserSignInHandlers(
 	];
 }
 
+type InitiateAuthSuccessHandlerOptions = BaseHandlerOptions & {
+	readonly region: string;
+	readonly userPoolId: string;
+};
+
+type InitiateAuthSuccessUserSignInHandlers = {
+	readonly username: string;
+};
+
+function initiateAuthSuccessUserSignInHandlers(
+	factory: RestHandlersFactory,
+	{ region, userPoolId, ...baseOptions }: InitiateAuthSuccessHandlerOptions,
+	{ username }: InitiateAuthSuccessUserSignInHandlers,
+) {
+	const tokens = createUserTokensForNow({
+		region,
+		userPoolId,
+		userId: username,
+		email: username,
+		emailVerified: true,
+	});
+	return [
+		createCognitoPostHandler(factory, {
+			...baseOptions,
+			target: "AWSCognitoIdentityProviderService.InitiateAuth",
+			bodyMatcher: (b) => {
+				return isMatch(b, {
+					AuthFlow: "USER_SRP_AUTH",
+					AuthParameters: {
+						USERNAME: username,
+					},
+				});
+			},
+			matchResponse: {
+				status: 200,
+				body: {
+					ChallengeName: "PASSWORD_VERIFIER",
+					ChallengeParameters: {
+						SALT: "salt123",
+						SECRET_BLOCK: "secretBlock",
+						SRP_B: "srpB",
+						USERNAME: "newUsername",
+						USER_ID_FOR_SRP: "newUsername",
+					},
+				},
+			},
+		}),
+		createCognitoPostHandler(factory, {
+			...baseOptions,
+			target: "AWSCognitoIdentityProviderService.RespondToAuthChallenge",
+			bodyMatcher: (body) => {
+				return isMatch(body, {
+					ChallengeName: "PASSWORD_VERIFIER",
+					ChallengeResponses: {
+						USERNAME: "newUsername",
+					},
+				});
+			},
+			matchResponse: {
+				status: 200,
+				body: {
+					AuthenticationResult: {
+						AccessToken: tokens.access,
+						IdToken: tokens.id,
+						RefreshToken: tokens.refresh,
+						TokenType: "Bearer",
+					},
+					ChallengeParameters: {},
+				},
+			},
+		}),
+	];
+}
+
 export type {
 	InitiateAuthNewPasswordRequiredOptions,
 	InitiateAuthNonConfirmedUserSignInHandlers,
+	InitiateAuthSuccessUserSignInHandlers,
 };
 export {
+	initiateAuthSuccessUserSignInHandlers,
 	initiateAuthNonConfirmedUserSignInHandlers,
 	initiateAuthNewPasswordRequiredHandlers,
 };

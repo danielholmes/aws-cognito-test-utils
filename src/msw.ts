@@ -6,21 +6,20 @@ import { BaseHandlerOptions } from "./create-handler";
 import {
 	initiateAuthNewPasswordRequiredHandlers,
 	initiateAuthNonConfirmedUserSignInHandlers,
+	initiateAuthSuccessUserSignInHandlers,
 } from "./initiate-auth";
 import resendConfirmationCodeHandler from "./resend-confirmation-code";
 import { createCognitoBaseUrl } from "./utils";
 import signUpHandler from "./sign-up";
 
 type Options = BaseHandlerOptions & {
+	readonly userPoolId: string;
 	readonly region: string;
 	readonly debug?: boolean;
 };
 
-function createCognitoHandlersFactory({
-	region,
-	debug,
-	...baseOptions
-}: Options) {
+function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
+	const { region } = baseOptions;
 	const builders = createRestHandlersFactory({
 		url: createCognitoBaseUrl(region),
 		debug,
@@ -34,6 +33,11 @@ function createCognitoHandlersFactory({
 		),
 		initiateAuthNewPasswordRequiredHandlers: partial(
 			initiateAuthNewPasswordRequiredHandlers,
+			builders,
+			baseOptions,
+		),
+		initiateAuthSuccessUserSignInHandlers: partial(
+			initiateAuthSuccessUserSignInHandlers,
 			builders,
 			baseOptions,
 		),
