@@ -7,7 +7,7 @@ import {
 } from "./create-handler";
 
 type GetUserOptions = Pick<CognitoPostOptions, "onCalled"> & {
-	readonly accessToken: string;
+	readonly accessToken?: string;
 	readonly username?: string;
 	readonly userAttributes?: Record<string, string>;
 };
@@ -22,6 +22,7 @@ function getUserHandler(
 		...rest,
 		target: "AWSCognitoIdentityProviderService.GetUser",
 		bodyMatcher: (b) =>
+			!accessToken ||
 			isEqual(b, {
 				AccessToken: accessToken,
 			}),
