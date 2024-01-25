@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "sideEffects": false,
@@ -10,7 +10,6 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },
     "./package.json": "./package.json"
@@ -24,9 +23,8 @@
     "format:check": "prettier -c \"src/**/*.ts\"",
     "ts": "tsc -p tsconfig.esm.json --noEmit",
     "prebuild": "run-p format:check ts",
-    "postbuild": "./scripts/cjs-extensions.sh",
     "build:esm": "rollup --config rollup.config.js",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:ts": "tsc -p tsconfig.types.json",
     "build": "npm-run-all -s clean -p build:*",
     "npm:publish": "npm publish --access public",
     "deploy": "run-s build npm:publish",
