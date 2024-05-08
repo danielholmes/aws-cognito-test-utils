@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "type": "module",
   "description": "MSW handlers for AWS Cognito",
   "sideEffects": false,
