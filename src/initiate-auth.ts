@@ -1,11 +1,11 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { isMatch } from "lodash-es";
-import { createUserTokensForNow } from "./tokens";
+import { createUserTokensForNow } from "./tokens.ts";
 import {
 	BaseHandlerOptions,
 	CognitoPostOptions,
 	createCognitoPostHandler,
-} from "./create-handler";
+} from "./create-handler.ts";
 
 type InitiateAuthNewPasswordRequiredOptions = {
 	readonly email: string;

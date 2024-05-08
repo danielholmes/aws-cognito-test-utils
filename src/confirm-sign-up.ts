@@ -4,7 +4,7 @@ import {
 	CognitoPostOptions,
 	BaseHandlerOptions,
 	createCognitoPostHandler,
-} from "./create-handler";
+} from "./create-handler.ts";
 
 type ConfirmSignUpOptions = Pick<CognitoPostOptions, "onCalled"> & {
 	readonly username: string;

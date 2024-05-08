@@ -5,7 +5,7 @@ import {
 	CognitoPostOptions,
 	BaseHandlerOptions,
 	createCognitoPostHandler,
-} from "./create-handler";
+} from "./create-handler.ts";
 
 type SignUpOptions = Pick<CognitoPostOptions, "onCalled"> & {
 	readonly username: string;
@@ -30,11 +30,9 @@ function signUpHandler(
 			(!userAttributes ||
 				isMatch(
 					Object.fromEntries(
-						(
-							(b as any).UserAttributes as unknown as
-								| CognitoUserAttribute[]
-								| undefined
-						)?.map((a) => [a.Name, a.Value]) ?? [],
+						(b.UserAttributes as CognitoUserAttribute[] | undefined)?.map(
+							(a) => [a.Name, a.Value],
+						) ?? [],
 					),
 					userAttributes,
 				)),

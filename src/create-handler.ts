@@ -39,6 +39,13 @@ function createCognitoPostHandler<
 	const partialBodyMatch = userPoolClientId
 		? { ClientId: userPoolClientId }
 		: {};
+	const body =
+		typeof bodyMatcher === "function"
+			? (b: RequestBody) => isMatch(b, partialBodyMatch) && bodyMatcher(b)
+			: {
+					...partialBodyMatch,
+					...bodyMatcher,
+				};
 	return factory.post<
 		TSearchParams,
 		{ "x-amz-target": string },
@@ -54,18 +61,13 @@ function createCognitoPostHandler<
 				isMatch(v, {
 					"x-amz-target": target,
 				}),
-			body:
-				typeof bodyMatcher === "function"
-					? (b: any) => isMatch(b, partialBodyMatch) && bodyMatcher(b)
-					: ({
-							...partialBodyMatch,
-							...bodyMatcher,
-						} as any),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			body: body as any,
 		},
 		() =>
 			HttpResponse.json(matchResponse.body, {
 				status: matchResponse.status,
-			}) as any,
+			}),
 		{ onCalled },
 	);
 }

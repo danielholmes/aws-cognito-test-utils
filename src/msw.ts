@@ -1,26 +1,27 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
 import { partial } from "lodash-es";
-import changePasswordHandler from "./change-password";
-import confirmSignUpHandler from "./confirm-sign-up";
-import { BaseHandlerOptions } from "./create-handler";
+import changePasswordHandler from "./change-password.ts";
+import confirmSignUpHandler from "./confirm-sign-up.ts";
+import { BaseHandlerOptions } from "./create-handler.ts";
 import {
 	initiateAuthNewPasswordRequiredHandlers,
 	initiateAuthNonConfirmedUserSignInHandlers,
 	initiateAuthSuccessUserSignInHandlers,
-} from "./initiate-auth";
-import resendConfirmationCodeHandler from "./resend-confirmation-code";
-import { createCognitoBaseUrl } from "./utils";
-import signUpHandler from "./sign-up";
-import getUserHandler from "./get-user";
+} from "./initiate-auth.ts";
+import resendConfirmationCodeHandler from "./resend-confirmation-code.ts";
+import { createCognitoBaseUrl } from "./utils.ts";
+import signUpHandler from "./sign-up.ts";
+import getUserHandler from "./get-user.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
-	readonly region: string;
 	readonly debug?: boolean;
 };
 
 function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
-	const { region } = baseOptions;
+	// TODO: Validate user pool id format
+	const { userPoolId } = baseOptions;
+	const region = userPoolId.split("_")[0];
 	const builders = createRestHandlersFactory({
 		url: createCognitoBaseUrl(region),
 		debug,
@@ -40,7 +41,10 @@ function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
 		initiateAuthSuccessUserSignInHandlers: partial(
 			initiateAuthSuccessUserSignInHandlers,
 			builders,
-			baseOptions,
+			{
+				...baseOptions,
+				region,
+			},
 		),
 		signUpHandler: partial(signUpHandler, builders, baseOptions),
 		confirmSignUpHandler: partial(confirmSignUpHandler, builders, baseOptions),

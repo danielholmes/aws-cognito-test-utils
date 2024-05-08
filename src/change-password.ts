@@ -1,6 +1,9 @@
 import { isMatch } from "lodash-es";
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import { CognitoPostOptions, createCognitoPostHandler } from "./create-handler";
+import {
+	CognitoPostOptions,
+	createCognitoPostHandler,
+} from "./create-handler.ts";
 
 type ChangePasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
 	readonly previousPassword: string;

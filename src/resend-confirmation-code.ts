@@ -4,7 +4,7 @@ import {
 	BaseHandlerOptions,
 	CognitoPostOptions,
 	createCognitoPostHandler,
-} from "./create-handler";
+} from "./create-handler.ts";
 
 type ResendConfirmationCodeOptions = Pick<CognitoPostOptions, "onCalled"> & {
 	readonly username: string;

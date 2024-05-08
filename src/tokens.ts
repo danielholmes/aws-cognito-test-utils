@@ -1,8 +1,11 @@
-import { createCognitoBaseUrl } from "./utils";
+import { createCognitoBaseUrl } from "./utils.ts";
 
 // "=" Padding is meant to be removed. See
 // https://datatracker.ietf.org/doc/html/rfc7515#section-3.2
-function encodeToken(first: Record<string, any>, second: Record<string, any>) {
+function encodeToken(
+	first: Record<string, unknown>,
+	second: Record<string, unknown>,
+) {
 	return [first, second]
 		.map((c) =>
 			Buffer.from(JSON.stringify(c)).toString("base64").replaceAll("=", ""),
