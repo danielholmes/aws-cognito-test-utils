@@ -1,8 +1,8 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "type": "module",
-  "description": "MSW handlers for AWS Cognito",
+  "description": "MSW handlers and other utils for AWS Cognito",
   "sideEffects": false,
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -37,7 +37,7 @@
   "author": "Daniel Holmes",
   "license": "MIT",
   "dependencies": {
-    "@dhau/msw-builders": "^0.0.25",
+    "@dhau/msw-builders": "^0.0.27",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

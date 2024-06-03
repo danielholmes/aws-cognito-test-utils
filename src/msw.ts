@@ -12,6 +12,10 @@ import resendConfirmationCodeHandler from "./resend-confirmation-code.ts";
 import { createCognitoBaseUrl } from "./utils.ts";
 import signUpHandler from "./sign-up.ts";
 import getUserHandler from "./get-user.ts";
+import {
+	confirmForgotPasswordHandler,
+	forgotPasswordHandler,
+} from "./forgot-password.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -27,6 +31,11 @@ function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
 		debug,
 	});
 	return {
+		forgotPasswordHandler: partial(forgotPasswordHandler, builders),
+		confirmForgotPasswordHandler: partial(
+			confirmForgotPasswordHandler,
+			builders,
+		),
 		changePasswordHandler: partial(changePasswordHandler, builders),
 		initiateAuthNonConfirmedUserSignInHandlers: partial(
 			initiateAuthNonConfirmedUserSignInHandlers,
