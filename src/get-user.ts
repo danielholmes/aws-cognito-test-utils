@@ -1,4 +1,5 @@
-import { isEqual, uniqueId } from "lodash-es";
+import isEqual from "lodash-es/isEqual.js";
+import uniqueId from "lodash-es/uniqueId.js";
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import {
 	CognitoPostOptions,

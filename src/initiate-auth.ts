@@ -1,5 +1,5 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import { isMatch } from "lodash-es";
+import isMatch from "lodash-es/isMatch.js";
 import { createUserTokensForNow } from "./tokens.ts";
 import {
 	BaseHandlerOptions,
@@ -70,14 +70,14 @@ function initiateAuthNewPasswordRequiredHandlers(
 	];
 }
 
-type InitiateAuthNonConfirmedUserSignInHandlers = {
+type InitiateAuthNonConfirmedUserSignInOptions = {
 	readonly username: string;
 };
 
 function initiateAuthNonConfirmedUserSignInHandlers(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
-	{ username }: InitiateAuthNonConfirmedUserSignInHandlers,
+	{ username }: InitiateAuthNonConfirmedUserSignInOptions,
 ) {
 	return [
 		createCognitoPostHandler(factory, {
@@ -207,7 +207,7 @@ function initiateAuthSuccessUserSignInHandlers(
 
 export type {
 	InitiateAuthNewPasswordRequiredOptions,
-	InitiateAuthNonConfirmedUserSignInHandlers,
+	InitiateAuthNonConfirmedUserSignInOptions,
 	InitiateAuthSuccessUserSignInOptions,
 };
 export {

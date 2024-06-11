@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: "./tsconfig.esm.json"
+    project: true
   },
   extends: [
     "prettier",

@@ -1,6 +1,6 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { DefaultBodyType, HttpResponse, PathParams } from "msw";
-import { isMatch } from "lodash-es";
+import isMatch from "lodash-es/isMatch.js";
 
 type BaseHandlerOptions = {
 	readonly userPoolClientId: string;

@@ -1,4 +1,4 @@
-import { isMatch } from "lodash-es";
+import isMatch from "lodash-es/isMatch.js";
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import {
 	BaseHandlerOptions,

@@ -20,4 +20,5 @@ npm add @dhau/aws-cognito-test-utils
 ### Publishing
 
 1. Manually set new version in `package.json`
-2. `npm run deploy`
+2. Manually set new version in `jsr.json`
+3. `npm run deploy`

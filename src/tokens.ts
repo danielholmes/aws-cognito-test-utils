@@ -8,7 +8,7 @@ function encodeToken(
 ) {
 	return [first, second]
 		.map((c) =>
-			Buffer.from(JSON.stringify(c)).toString("base64").replaceAll("=", ""),
+			Buffer.from(JSON.stringify(c)).toString("base64").replace(/=/g, ""),
 		)
 		.join(".");
 }
@@ -98,7 +98,7 @@ function createUserTokensForDate(
 	};
 }
 
-function createUserTokensForNow(options: UserTokensOptions) {
+function createUserTokensForNow(options: UserTokensOptions): UserTokens {
 	return createUserTokensForDate(options, new Date());
 }
 
