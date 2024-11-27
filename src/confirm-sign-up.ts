@@ -3,36 +3,37 @@ import { isMatch } from "./utils.ts";
 import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
 import { createCognitoPostHandler } from "./create-handler.ts";
 
-type ConfirmSignUpOptions = {
-	readonly username: string;
-	readonly code: string;
+type ConfirmSignUpRequest = {
+	readonly Username: string;
+	readonly ConfirmationCode: string;
+	readonly Session?: string;
+};
+
+type ConfirmSignUpResponse = {
+	readonly Session?: string;
 };
 
 function confirmSignUpHandler(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
-	{ username, code, ...rest }: ConfirmSignUpOptions,
+	request: ConfirmSignUpRequest,
+	response?: ConfirmSignUpResponse,
 	handlerOptions?: HandlerOptions,
 ) {
 	return createCognitoPostHandler(
 		factory,
 		{
 			...baseOptions,
-			...rest,
 			target: "AWSCognitoIdentityProviderService.ConfirmSignUp",
-			bodyMatcher: (b) =>
-				isMatch(b, {
-					Username: username,
-					ConfirmationCode: code,
-				}),
+			bodyMatcher: (b) => isMatch(b, request),
 			matchResponse: {
 				status: 200,
-				body: {},
+				body: response ?? ({} satisfies ConfirmSignUpResponse),
 			},
 		},
 		handlerOptions,
 	);
 }
 
-export type { ConfirmSignUpOptions };
+export type { ConfirmSignUpRequest, ConfirmSignUpResponse };
 export default confirmSignUpHandler;

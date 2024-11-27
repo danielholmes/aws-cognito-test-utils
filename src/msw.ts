@@ -2,7 +2,10 @@ import { createRestHandlersFactory } from "@dhau/msw-builders";
 import type { HttpHandler } from "msw";
 import type { ChangePasswordOptions } from "./change-password.ts";
 import changePasswordHandler from "./change-password.ts";
-import type { ConfirmSignUpOptions } from "./confirm-sign-up.ts";
+import type {
+	ConfirmSignUpRequest,
+	ConfirmSignUpResponse,
+} from "./confirm-sign-up.ts";
 import confirmSignUpHandler from "./confirm-sign-up.ts";
 import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
 import type {
@@ -65,7 +68,8 @@ type CognitoHandlersFactory = {
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	confirmSignUpHandler: (
-		options: ConfirmSignUpOptions,
+		request: ConfirmSignUpRequest,
+		response: ConfirmSignUpResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	getUserHandler: (

@@ -9,9 +9,9 @@ type CognitoUserAttribute = {
 };
 
 type SignUpRequest = {
-	readonly username: string;
-	readonly password: string;
-	readonly userAttributes?: Record<string, string>;
+	readonly Username: string;
+	readonly Password: string;
+	readonly UserAttributes?: Record<string, string>;
 };
 
 // Copied from sdk cognito-identity-provider so don't need dep
@@ -34,7 +34,7 @@ type SignUpResponse = {
 function signUpHandler(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
-	{ username, password, userAttributes, ...rest }: SignUpRequest,
+	{ Username, Password, UserAttributes }: SignUpRequest,
 	response: SignUpResponse | undefined,
 	handlerOptions?: HandlerOptions,
 ) {
@@ -42,21 +42,20 @@ function signUpHandler(
 		factory,
 		{
 			...baseOptions,
-			...rest,
 			target: "AWSCognitoIdentityProviderService.SignUp",
 			bodyMatcher: (b) =>
 				isMatch(b, {
-					Username: username,
-					Password: password,
+					Username,
+					Password,
 				}) &&
-				(!userAttributes ||
+				(!UserAttributes ||
 					isMatch(
 						Object.fromEntries(
 							(b.UserAttributes as CognitoUserAttribute[] | undefined)?.map(
 								(a) => [a.Name, a.Value],
 							) ?? [],
 						),
-						userAttributes,
+						UserAttributes,
 					)),
 			matchResponse: {
 				status: 200,

@@ -24,9 +24,9 @@ describe("msw", () => {
 			server.use(
 				factory.signUpHandler(
 					{
-						username: "tester@company.com",
-						password: "Test123!",
-						userAttributes: {
+						Username: "tester@company.com",
+						Password: "Test123!",
+						UserAttributes: {
 							email: "tester@company.com",
 							"custom:account_type": "INSTITUTION",
 						},
