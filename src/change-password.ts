@@ -1,11 +1,8 @@
-import isMatch from "lodash-es/isMatch.js";
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import {
-	CognitoPostOptions,
-	createCognitoPostHandler,
-} from "./create-handler.ts";
+import { isMatch } from "./utils.ts";
+import { HandlerOptions, createCognitoPostHandler } from "./create-handler.ts";
 
-type ChangePasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
+type ChangePasswordOptions = {
 	readonly previousPassword: string;
 	readonly proposedPassword: string;
 	readonly accessToken: string;
@@ -21,22 +18,27 @@ function changePasswordHandler(
 		clientMetadata,
 		...rest
 	}: ChangePasswordOptions,
+	handlerOptions?: HandlerOptions,
 ) {
-	return createCognitoPostHandler(factory, {
-		...rest,
-		target: "AWSCognitoIdentityProviderService.ChangePassword",
-		bodyMatcher: (b) =>
-			isMatch(b, {
-				PreviousPassword: previousPassword,
-				ProposedPassword: proposedPassword,
-				AccessToken: accessToken,
-				...(clientMetadata ? { ClientMetadata: clientMetadata } : {}),
-			}),
-		matchResponse: {
-			status: 200,
-			body: {},
+	return createCognitoPostHandler(
+		factory,
+		{
+			...rest,
+			target: "AWSCognitoIdentityProviderService.ChangePassword",
+			bodyMatcher: (b) =>
+				isMatch(b, {
+					PreviousPassword: previousPassword,
+					ProposedPassword: proposedPassword,
+					AccessToken: accessToken,
+					...(clientMetadata ? { ClientMetadata: clientMetadata } : {}),
+				}),
+			matchResponse: {
+				status: 200,
+				body: {},
+			},
 		},
-	});
+		handlerOptions,
+	);
 }
 
 export type { ChangePasswordOptions };

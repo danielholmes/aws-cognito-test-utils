@@ -22,17 +22,22 @@ describe("msw", () => {
 			});
 			let signUpCalled = false;
 			server.use(
-				factory.signUpHandler({
-					username: "tester@company.com",
-					password: "Test123!",
-					userAttributes: {
-						email: "tester@company.com",
-						"custom:account_type": "INSTITUTION",
+				factory.signUpHandler(
+					{
+						username: "tester@company.com",
+						password: "Test123!",
+						userAttributes: {
+							email: "tester@company.com",
+							"custom:account_type": "INSTITUTION",
+						},
 					},
-					onCalled() {
-						signUpCalled = true;
+					undefined,
+					{
+						onCalled() {
+							signUpCalled = true;
+						},
 					},
-				}),
+				),
 			);
 
 			const response = await fetch(

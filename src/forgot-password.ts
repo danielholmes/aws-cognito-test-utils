@@ -1,33 +1,35 @@
-import isMatch from "lodash-es/isMatch.js";
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import {
-	CognitoPostOptions,
-	createCognitoPostHandler,
-} from "./create-handler.ts";
+import { isMatch } from "./utils.ts";
+import { HandlerOptions, createCognitoPostHandler } from "./create-handler.ts";
 
-type ForgotPasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
+type ForgotPasswordOptions = {
 	readonly username: string;
 };
 
 function forgotPasswordHandler(
 	factory: RestHandlersFactory,
 	{ username, ...rest }: ForgotPasswordOptions,
+	handlerOptions?: HandlerOptions,
 ) {
-	return createCognitoPostHandler(factory, {
-		...rest,
-		target: "AWSCognitoIdentityProviderService.ForgotPassword",
-		bodyMatcher: (b) =>
-			isMatch(b, {
-				Username: username,
-			}),
-		matchResponse: {
-			status: 200,
-			body: {},
+	return createCognitoPostHandler(
+		factory,
+		{
+			...rest,
+			target: "AWSCognitoIdentityProviderService.ForgotPassword",
+			bodyMatcher: (b) =>
+				isMatch(b, {
+					Username: username,
+				}),
+			matchResponse: {
+				status: 200,
+				body: {},
+			},
 		},
-	});
+		handlerOptions,
+	);
 }
 
-type ConfirmForgotPasswordOptions = Pick<CognitoPostOptions, "onCalled"> & {
+type ConfirmForgotPasswordOptions = {
 	readonly username: string;
 	readonly verificationCode: string;
 	readonly password: string;
@@ -41,21 +43,26 @@ function confirmForgotPasswordHandler(
 		password,
 		...rest
 	}: ConfirmForgotPasswordOptions,
+	handlerOptions?: HandlerOptions,
 ) {
-	return createCognitoPostHandler(factory, {
-		...rest,
-		target: "AWSCognitoIdentityProviderService.ConfirmForgotPassword",
-		bodyMatcher: (b) =>
-			isMatch(b, {
-				Username: username,
-				ConfirmationCode: verificationCode,
-				Password: password,
-			}),
-		matchResponse: {
-			status: 200,
-			body: {},
+	return createCognitoPostHandler(
+		factory,
+		{
+			...rest,
+			target: "AWSCognitoIdentityProviderService.ConfirmForgotPassword",
+			bodyMatcher: (b) =>
+				isMatch(b, {
+					Username: username,
+					ConfirmationCode: verificationCode,
+					Password: password,
+				}),
+			matchResponse: {
+				status: 200,
+				body: {},
+			},
 		},
-	});
+		handlerOptions,
+	);
 }
 
 export type { ForgotPasswordOptions, ConfirmForgotPasswordOptions };

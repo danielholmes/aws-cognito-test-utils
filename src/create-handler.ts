@@ -1,6 +1,6 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
 import { DefaultBodyType, HttpResponse, PathParams } from "msw";
-import isMatch from "lodash-es/isMatch.js";
+import { isMatch } from "./utils.ts";
 
 type BaseHandlerOptions = {
 	readonly userPoolClientId: string;
@@ -18,8 +18,11 @@ type CognitoPostOptions<
 			readonly status: number;
 			readonly body: ResponseBody;
 		};
-		readonly onCalled?: () => void;
 	};
+
+type HandlerOptions = {
+	readonly onCalled?: () => void;
+};
 
 function createCognitoPostHandler<
 	TSearchParams extends Record<string, string>,
@@ -33,8 +36,8 @@ function createCognitoPostHandler<
 		target,
 		bodyMatcher,
 		matchResponse,
-		onCalled,
 	}: CognitoPostOptions<Params, RequestBody, ResponseBody>,
+	handlerOptions?: HandlerOptions,
 ) {
 	const partialBodyMatch = userPoolClientId
 		? { ClientId: userPoolClientId }
@@ -68,9 +71,9 @@ function createCognitoPostHandler<
 			HttpResponse.json(matchResponse.body, {
 				status: matchResponse.status,
 			}),
-		{ onCalled },
+		handlerOptions,
 	);
 }
 
-export type { BaseHandlerOptions, CognitoPostOptions };
+export type { BaseHandlerOptions, HandlerOptions, CognitoPostOptions };
 export { createCognitoPostHandler };

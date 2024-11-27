@@ -1,9 +1,8 @@
 import { RestHandlersFactory } from "@dhau/msw-builders";
-import isMatch from "lodash-es/isMatch.js";
+import { isMatch } from "./utils.ts";
 import { createUserTokensForNow } from "./tokens.ts";
 import {
 	BaseHandlerOptions,
-	CognitoPostOptions,
 	createCognitoPostHandler,
 } from "./create-handler.ts";
 
@@ -132,10 +131,7 @@ type InitiateAuthSuccessHandlerOptions = BaseHandlerOptions & {
 	readonly userPoolId: string;
 };
 
-type InitiateAuthSuccessUserSignInOptions = Pick<
-	CognitoPostOptions,
-	"onCalled"
-> & {
+type InitiateAuthSuccessUserSignInOptions = {
 	readonly username: string;
 };
 

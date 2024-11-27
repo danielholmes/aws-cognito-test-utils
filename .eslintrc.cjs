@@ -29,6 +29,9 @@ module.exports = {
     // I Like all exports being at end of file
     "import/exports-last": "error",
 
+    // Have some uses
+    "@typescript-eslint/no-explicit-any": "off",
+
     // Default was interfaces, I like types
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
 

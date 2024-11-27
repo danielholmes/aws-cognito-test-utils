@@ -1,12 +1,12 @@
-import isMatch from "lodash-es/isMatch.js";
 import { RestHandlersFactory } from "@dhau/msw-builders";
+import { isMatch } from "./utils.ts";
 import {
 	BaseHandlerOptions,
-	CognitoPostOptions,
+	HandlerOptions,
 	createCognitoPostHandler,
 } from "./create-handler.ts";
 
-type ResendConfirmationCodeOptions = Pick<CognitoPostOptions, "onCalled"> & {
+type ResendConfirmationCodeOptions = {
 	readonly username: string;
 };
 
@@ -14,20 +14,25 @@ function resendConfirmationCodeHandler(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
 	{ username, ...rest }: ResendConfirmationCodeOptions,
+	handlerOptions?: HandlerOptions,
 ) {
-	return createCognitoPostHandler(factory, {
-		...baseOptions,
-		...rest,
-		target: "AWSCognitoIdentityProviderService.ResendConfirmationCode",
-		bodyMatcher: (b) =>
-			isMatch(b, {
-				Username: username,
-			}),
-		matchResponse: {
-			status: 200,
-			body: {},
+	return createCognitoPostHandler(
+		factory,
+		{
+			...baseOptions,
+			...rest,
+			target: "AWSCognitoIdentityProviderService.ResendConfirmationCode",
+			bodyMatcher: (b) =>
+				isMatch(b, {
+					Username: username,
+				}),
+			matchResponse: {
+				status: 200,
+				body: {},
+			},
 		},
-	});
+		handlerOptions,
+	);
 }
 
 export type { ResendConfirmationCodeOptions };
