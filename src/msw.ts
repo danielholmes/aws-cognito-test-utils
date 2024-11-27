@@ -1,16 +1,32 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
+import type { HttpHandler } from "msw";
+import type { SignUpResponse } from "@aws-sdk/client-cognito-identity-provider";
+import type { ChangePasswordOptions } from "./change-password.ts";
 import changePasswordHandler from "./change-password.ts";
+import type { ConfirmSignUpOptions } from "./confirm-sign-up.ts";
 import confirmSignUpHandler from "./confirm-sign-up.ts";
-import { BaseHandlerOptions } from "./create-handler.ts";
+import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
+import type {
+	InitiateAuthNewPasswordRequiredOptions,
+	InitiateAuthNonConfirmedUserSignInOptions,
+	InitiateAuthSuccessUserSignInOptions,
+} from "./initiate-auth.ts";
 import {
 	initiateAuthNewPasswordRequiredHandlers,
 	initiateAuthNonConfirmedUserSignInHandlers,
 	initiateAuthSuccessUserSignInHandlers,
 } from "./initiate-auth.ts";
+import type { ResendConfirmationCodeOptions } from "./resend-confirmation-code.ts";
 import resendConfirmationCodeHandler from "./resend-confirmation-code.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
+import type { SignUpOptions } from "./sign-up.ts";
 import signUpHandler from "./sign-up.ts";
+import type { GetUserOptions } from "./get-user.ts";
 import getUserHandler from "./get-user.ts";
+import type {
+	ConfirmForgotPasswordOptions,
+	ForgotPasswordOptions,
+} from "./forgot-password.ts";
 import {
 	confirmForgotPasswordHandler,
 	forgotPasswordHandler,
@@ -21,7 +37,52 @@ type Options = BaseHandlerOptions & {
 	readonly debug?: boolean;
 };
 
-function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
+// Note: Keep explicit return type. It's something required by JSR
+type CognitoHandlersFactory = {
+	forgotPasswordHandler: (
+		options: ForgotPasswordOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	confirmForgotPasswordHandler: (
+		options: ConfirmForgotPasswordOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	changePasswordHandler: (
+		options: ChangePasswordOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	initiateAuthNonConfirmedUserSignInHandlers: (
+		options: InitiateAuthNonConfirmedUserSignInOptions,
+	) => readonly HttpHandler[];
+	initiateAuthNewPasswordRequiredHandlers: (
+		options: InitiateAuthNewPasswordRequiredOptions,
+	) => readonly HttpHandler[];
+	initiateAuthSuccessUserSignInHandlers: (
+		options: InitiateAuthSuccessUserSignInOptions,
+	) => readonly HttpHandler[];
+	signUpHandler: (
+		options: SignUpOptions,
+		response: SignUpResponse | undefined,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	confirmSignUpHandler: (
+		options: ConfirmSignUpOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	getUserHandler: (
+		options: GetUserOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	resendConfirmationCodeHandler: (
+		options: ResendConfirmationCodeOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+};
+
+function createCognitoHandlersFactory({
+	debug,
+	...baseOptions
+}: Options): CognitoHandlersFactory {
 	// TODO: Validate user pool id format
 	const { userPoolId } = baseOptions;
 	const region = userPoolId.split("_")[0];
@@ -64,10 +125,6 @@ function createCognitoHandlersFactory({ debug, ...baseOptions }: Options) {
 		),
 	};
 }
-
-type CognitoHandlersFactory = Readonly<
-	ReturnType<typeof createCognitoHandlersFactory>
->;
 
 export type { CognitoHandlersFactory };
 export { createCognitoHandlersFactory };

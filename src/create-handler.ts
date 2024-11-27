@@ -1,5 +1,6 @@
-import { RestHandlersFactory } from "@dhau/msw-builders";
-import { DefaultBodyType, HttpResponse, PathParams } from "msw";
+import type { RestHandlersFactory } from "@dhau/msw-builders";
+import type { DefaultBodyType, PathParams } from "msw";
+import { HttpResponse } from "msw";
 import { isMatch } from "./utils.ts";
 
 type BaseHandlerOptions = {

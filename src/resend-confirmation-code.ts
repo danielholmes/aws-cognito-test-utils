@@ -1,10 +1,7 @@
-import { RestHandlersFactory } from "@dhau/msw-builders";
+import type { RestHandlersFactory } from "@dhau/msw-builders";
 import { isMatch } from "./utils.ts";
-import {
-	BaseHandlerOptions,
-	HandlerOptions,
-	createCognitoPostHandler,
-} from "./create-handler.ts";
+import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
+import { createCognitoPostHandler } from "./create-handler.ts";
 
 type ResendConfirmationCodeOptions = {
 	readonly username: string;

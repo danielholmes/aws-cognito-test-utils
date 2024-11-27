@@ -1,10 +1,8 @@
-import { RestHandlersFactory } from "@dhau/msw-builders";
+import type { RestHandlersFactory } from "@dhau/msw-builders";
 import { isMatch } from "./utils.ts";
 import { createUserTokensForNow } from "./tokens.ts";
-import {
-	BaseHandlerOptions,
-	createCognitoPostHandler,
-} from "./create-handler.ts";
+import type { BaseHandlerOptions } from "./create-handler.ts";
+import { createCognitoPostHandler } from "./create-handler.ts";
 
 type InitiateAuthNewPasswordRequiredOptions = {
 	readonly email: string;

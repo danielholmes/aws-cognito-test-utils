@@ -1,10 +1,7 @@
 import type { SignUpResponse } from "@aws-sdk/client-cognito-identity-provider";
-import { RestHandlersFactory } from "@dhau/msw-builders";
-import {
-	HandlerOptions,
-	BaseHandlerOptions,
-	createCognitoPostHandler,
-} from "./create-handler.ts";
+import type { RestHandlersFactory } from "@dhau/msw-builders";
+import type { HandlerOptions, BaseHandlerOptions } from "./create-handler.ts";
+import { createCognitoPostHandler } from "./create-handler.ts";
 import { isMatch, uniqueId } from "./utils.ts";
 
 type CognitoUserAttribute = {

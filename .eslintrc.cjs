@@ -23,6 +23,9 @@ module.exports = {
     "filenames"
   ],
   rules: {
+    // Try and ensure certain deps not included
+    "@typescript-eslint/consistent-type-imports": "error",
+
     // Better performance when include extensions
     "import/extensions": ["error", "ignorePackages"],
     

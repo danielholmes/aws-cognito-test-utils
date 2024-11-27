@@ -1,6 +1,7 @@
-import { RestHandlersFactory } from "@dhau/msw-builders";
+import type { RestHandlersFactory } from "@dhau/msw-builders";
 import { isMatch } from "./utils.ts";
-import { HandlerOptions, createCognitoPostHandler } from "./create-handler.ts";
+import type { HandlerOptions } from "./create-handler.ts";
+import { createCognitoPostHandler } from "./create-handler.ts";
 
 type ForgotPasswordOptions = {
 	readonly username: string;
