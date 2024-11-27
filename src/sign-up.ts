@@ -1,4 +1,3 @@
-import type { SignUpResponse } from "@aws-sdk/client-cognito-identity-provider";
 import type { RestHandlersFactory } from "@dhau/msw-builders";
 import type { HandlerOptions, BaseHandlerOptions } from "./create-handler.ts";
 import { createCognitoPostHandler } from "./create-handler.ts";
@@ -9,16 +8,33 @@ type CognitoUserAttribute = {
 	readonly Value: string;
 };
 
-type SignUpOptions = {
+type SignUpRequest = {
 	readonly username: string;
 	readonly password: string;
 	readonly userAttributes?: Record<string, string>;
 };
 
+// Copied from sdk cognito-identity-provider so don't need dep
+// installation.
+type DeliveryMediumType = "EMAIL" | "SMS";
+
+type CodeDeliveryDetailsType = {
+	Destination?: string | undefined;
+	DeliveryMedium?: DeliveryMediumType | undefined;
+	AttributeName?: string | undefined;
+};
+
+type SignUpResponse = {
+	UserConfirmed: boolean | undefined;
+	CodeDeliveryDetails?: CodeDeliveryDetailsType | undefined;
+	UserSub: string | undefined;
+	Session?: string | undefined;
+};
+
 function signUpHandler(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
-	{ username, password, userAttributes, ...rest }: SignUpOptions,
+	{ username, password, userAttributes, ...rest }: SignUpRequest,
 	response: SignUpResponse | undefined,
 	handlerOptions?: HandlerOptions,
 ) {
@@ -63,5 +79,5 @@ function signUpHandler(
 	);
 }
 
-export type { SignUpOptions };
+export type { SignUpRequest, SignUpResponse };
 export default signUpHandler;

@@ -1,6 +1,5 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
 import type { HttpHandler } from "msw";
-import type { SignUpResponse } from "@aws-sdk/client-cognito-identity-provider";
 import type { ChangePasswordOptions } from "./change-password.ts";
 import changePasswordHandler from "./change-password.ts";
 import type { ConfirmSignUpOptions } from "./confirm-sign-up.ts";
@@ -19,7 +18,7 @@ import {
 import type { ResendConfirmationCodeOptions } from "./resend-confirmation-code.ts";
 import resendConfirmationCodeHandler from "./resend-confirmation-code.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
-import type { SignUpOptions } from "./sign-up.ts";
+import type { SignUpRequest, SignUpResponse } from "./sign-up.ts";
 import signUpHandler from "./sign-up.ts";
 import type { GetUserOptions } from "./get-user.ts";
 import getUserHandler from "./get-user.ts";
@@ -61,7 +60,7 @@ type CognitoHandlersFactory = {
 		options: InitiateAuthSuccessUserSignInOptions,
 	) => readonly HttpHandler[];
 	signUpHandler: (
-		options: SignUpOptions,
+		request: SignUpRequest,
 		response: SignUpResponse | undefined,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
