@@ -254,7 +254,6 @@ type InitiateAuthRequest = {
 	AuthFlow: AuthFlowType | undefined;
 	AuthParameters?: Record<string, string> | undefined;
 	ClientMetadata?: Record<string, string> | undefined;
-	ClientId: string | undefined;
 	AnalyticsMetadata?: AnalyticsMetadataType | undefined;
 	UserContextData?: UserContextDataType | undefined;
 	Session?: string | undefined;
