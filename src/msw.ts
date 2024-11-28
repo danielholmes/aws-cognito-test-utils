@@ -11,9 +11,12 @@ import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
 import type {
 	InitiateAuthNewPasswordRequiredOptions,
 	InitiateAuthNonConfirmedUserSignInOptions,
+	InitiateAuthRequest,
+	InitiateAuthResponse,
 	InitiateAuthSuccessUserSignInOptions,
 } from "./initiate-auth.ts";
 import {
+	initiateAuthHandler,
 	initiateAuthNewPasswordRequiredHandlers,
 	initiateAuthNonConfirmedUserSignInHandlers,
 	initiateAuthSuccessUserSignInHandlers,
@@ -64,12 +67,12 @@ type CognitoHandlersFactory = {
 	) => readonly HttpHandler[];
 	signUpHandler: (
 		request: SignUpRequest,
-		response: SignUpResponse | undefined,
+		response?: SignUpResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	confirmSignUpHandler: (
 		request: ConfirmSignUpRequest,
-		response: ConfirmSignUpResponse,
+		response?: ConfirmSignUpResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	getUserHandler: (
@@ -78,6 +81,11 @@ type CognitoHandlersFactory = {
 	) => HttpHandler;
 	resendConfirmationCodeHandler: (
 		options: ResendConfirmationCodeOptions,
+		handlerOptions?: HandlerOptions,
+	) => HttpHandler;
+	initiateAuthHandler: (
+		request: InitiateAuthRequest,
+		response?: InitiateAuthResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 };
@@ -105,6 +113,7 @@ function createCognitoHandlersFactory({
 			builders,
 			baseOptions,
 		),
+		initiateAuthHandler: partial(initiateAuthHandler, builders, baseOptions),
 		initiateAuthNewPasswordRequiredHandlers: partial(
 			initiateAuthNewPasswordRequiredHandlers,
 			builders,

@@ -35,7 +35,7 @@ function signUpHandler(
 	factory: RestHandlersFactory,
 	baseOptions: BaseHandlerOptions,
 	{ Username, Password, UserAttributes }: SignUpRequest,
-	response: SignUpResponse | undefined,
+	response?: SignUpResponse,
 	handlerOptions?: HandlerOptions,
 ) {
 	return createCognitoPostHandler(
