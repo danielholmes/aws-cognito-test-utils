@@ -44,65 +44,66 @@ import type {
 	SetUserMFAPreferenceResponse,
 } from "./actions/set-user-mfapreference.ts";
 type CognitoHandlersFactory = {
-	changePasswordHandler: (
+	wellKnownJwksHandler(): HttpHandler;
+	changePasswordHandler(
 		request: ChangePasswordRequest,
 		response?: ChangePasswordResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	forgotPasswordHandler: (
+	): HttpHandler;
+	forgotPasswordHandler(
 		request: ForgotPasswordRequest,
 		response?: ForgotPasswordResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	confirmForgotPasswordHandler: (
+	): HttpHandler;
+	confirmForgotPasswordHandler(
 		request: ConfirmForgotPasswordRequest,
 		response?: ConfirmForgotPasswordResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	confirmSignUpHandler: (
+	): HttpHandler;
+	confirmSignUpHandler(
 		request: ConfirmSignUpRequest,
 		response?: ConfirmSignUpResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	getUserHandler: (
+	): HttpHandler;
+	getUserHandler(
 		request: GetUserRequest,
 		response: GetUserResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	resendConfirmationCodeHandler: (
+	): HttpHandler;
+	resendConfirmationCodeHandler(
 		request: ResendConfirmationCodeRequest,
 		response?: ResendConfirmationCodeResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	signUpHandler: (
+	): HttpHandler;
+	signUpHandler(
 		request: SignUpRequest,
 		response: SignUpResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	initiateAuthHandler: (
+	): HttpHandler;
+	initiateAuthHandler(
 		request: InitiateAuthRequest,
 		response?: InitiateAuthResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	respondToAuthChallengeHandler: (
+	): HttpHandler;
+	respondToAuthChallengeHandler(
 		request: RespondToAuthChallengeRequest,
 		response?: RespondToAuthChallengeResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	associateSoftwareTokenHandler: (
+	): HttpHandler;
+	associateSoftwareTokenHandler(
 		request: AssociateSoftwareTokenRequest,
 		response?: AssociateSoftwareTokenResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	verifySoftwareTokenHandler: (
+	): HttpHandler;
+	verifySoftwareTokenHandler(
 		request: VerifySoftwareTokenRequest,
 		response?: VerifySoftwareTokenResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	setUserMFAPreferenceHandler: (
+	): HttpHandler;
+	setUserMFAPreferenceHandler(
 		request: SetUserMFAPreferenceRequest,
 		response?: SetUserMFAPreferenceResponse,
 		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
+	): HttpHandler;
 };
 export type { CognitoHandlersFactory };

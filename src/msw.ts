@@ -1,4 +1,5 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
+import { HttpResponse } from "msw";
 import type { BaseHandlerOptions } from "./create-handler.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
 import changePasswordHandler from "./actions/change-password.ts";
@@ -14,6 +15,7 @@ import setUserMFAPreferenceHandler from "./actions/set-user-mfapreference.ts";
 import associateSoftwareTokenHandler from "./actions/associate-software-token.ts";
 import respondToAuthChallengeHandler from "./actions/respond-to-auth-challenge.ts";
 import verifySoftwareTokenHandler from "./actions/verify-software-token.ts";
+import { publicKey } from "./tokens/keys.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -56,6 +58,12 @@ function createCognitoHandlersFactory({
 			builders,
 		),
 		verifySoftwareTokenHandler: partial(verifySoftwareTokenHandler, builders),
+		wellKnownJwksHandler: () =>
+			builders.get(`/us-east-1_testaaaaa/.well-known/jwks.json`, {}, () =>
+				HttpResponse.json({
+					keys: [publicKey.jwk],
+				}),
+			),
 	};
 }
 

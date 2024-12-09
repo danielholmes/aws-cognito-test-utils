@@ -327,6 +327,7 @@ const importDeclarations = `// Note: Keep explicit return type. It's something r
 			.join("\n")}
     ;`;
 const typeDeclaration = `type CognitoHandlersFactory = {
+		wellKnownJwksHandler(): HttpHandler,
         ${operationDatas
 					.map(
 						({
@@ -335,11 +336,11 @@ const typeDeclaration = `type CognitoHandlersFactory = {
 							emptyValidForResponse,
 							responseName,
 						}) =>
-							`${nameCamelCase}Handler: (
+							`${nameCamelCase}Handler(
                 request: ${requestName},
                 response${emptyValidForResponse ? "?" : ""}: ${responseName},
                 handlerOptions?: HandlerOptions,
-            ) => HttpHandler;`,
+            ): HttpHandler;`,
 					)
 					.join("\n")}
     }`;
