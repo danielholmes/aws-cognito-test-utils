@@ -1,5 +1,6 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
-import { HttpResponse, RequestHandlerOptions } from "msw";
+import type { RequestHandlerOptions } from "msw";
+import { HttpResponse } from "msw";
 import type { BaseHandlerOptions } from "./create-handler.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
 import changePasswordHandler from "./actions/change-password.ts";
