@@ -29,13 +29,25 @@ const operations = [
     },
     {
         name: "RespondToAuthChallenge"
+    },
+    {
+        name: "AssociateSoftwareToken"
+    },
+    {
+        name: "VerifySoftwareToken"
+    },
+    {
+        name: "SetUserMFAPreference"
     }
 ];
 
-const actionsDirpath = path.join(
+const srcDirpath = path.join(
     import.meta.dirname,
     "..",
-    "src",
+    "src"
+);
+const actionsDirpath = path.join(
+    srcDirpath,
     "actions"
 );
 
@@ -154,39 +166,52 @@ async function findInterfaceOrTypeAndLinkedTypesByName(name: string): Promise<re
     )).flat();
 }
 
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-await Promise.all(
+const operationDatas = await Promise.all(
     operations.map(async (o) => {
         const filename = o.name.replace(/([a-z0–9])([A-Z])/g, "$1-$2").toLowerCase();
-        const sourceFile = ts.createSourceFile(
-            `${filename}.ts`,
-            '',
-            ts.ScriptTarget.Latest,
-            false,
-            ts.ScriptKind.TS,
-          );
-
-          // Find model types
-          const requestName = `${o.name}Request`;
-          const responseName = `${o.name}Response`;
-          const [requestAsts, responseAsts] = await Promise.all([
+        
+        // Find model types
+        const requestName = `${o.name}Request`;
+        const responseName = `${o.name}Response`;
+        const [requestAsts, responseAsts] = await Promise.all([
             findInterfaceOrTypeAndLinkedTypesByName(requestName),
             findInterfaceOrTypeAndLinkedTypesByName(responseName)
-          ]);
-          const { node: responseAst } = responseAsts[0];
-          if (!ts.isInterfaceDeclaration(responseAst)) {
+        ]);
+        const { node: responseAst } = responseAsts[0];
+        if (!ts.isInterfaceDeclaration(responseAst)) {
             throw new Error("Response is not an interface");
-          }
-          const emptyValidForResponse = responseAst.members.every(m => m.questionToken);
-          const uniqueAsts = [...requestAsts, ...responseAsts].reduce((accu, a) => {
+        }
+        const emptyValidForResponse = responseAst.members.every(m => m.questionToken);
+        const structAsts = [...requestAsts, ...responseAsts].reduce((accu, a) => {
             if (accu.some(s => s.source === a.source)) {
                 return accu;
             }
             return [...accu, a];
-          }, [] as readonly NodeInfo[]).map(a => a.node);
-          const oNameLower = o.name.charAt(0).toLowerCase() + o.name.substring(1);
+        }, [] as readonly NodeInfo[]).map(a => a.node);
+          
+          return {
+            ...o,
+            nameCamelCase: o.name.charAt(0).toLowerCase() + o.name.substring(1),
+            requestName, responseName,
+            structAsts,
+            filename,
+            emptyValidForResponse
+          }
+        })
+    )
+    
 
-          const requestResponseTypes = printer.printList(ts.ListFormat.MultiLine, factory.createNodeArray(uniqueAsts), sourceFile);
+
+const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+await Promise.all(operationDatas.map(async ({ name, nameCamelCase, filename, emptyValidForResponse, structAsts, requestName, responseName }) => {
+    const sourceFile = ts.createSourceFile(
+        `${filename}.ts`,
+        '',
+        ts.ScriptTarget.Latest,
+        false,
+        ts.ScriptKind.TS,
+    );
+    const structsOutput = printer.printList(ts.ListFormat.MultiLine, factory.createNodeArray(structAsts), sourceFile);
 
           const handlerOutput = `
             import type { RestHandlersFactory } from "@dhau/msw-builders";
@@ -194,9 +219,9 @@ await Promise.all(
             import type { HandlerOptions } from "../create-handler.ts";
             import { createCognitoPostHandler } from "../create-handler.ts";
 
-            ${requestResponseTypes}
+            ${structsOutput}
 
-            function ${oNameLower}Handler(
+            function ${nameCamelCase}Handler(
                 factory: RestHandlersFactory,
                 request: ${requestName},
                 response${emptyValidForResponse ? "?" : ""}: ${responseName},
@@ -205,7 +230,7 @@ await Promise.all(
                 return createCognitoPostHandler(
                     factory,
                     {
-                        target: "AWSCognitoIdentityProviderService.${o.name}",
+                        target: "AWSCognitoIdentityProviderService.${name}",
                         bodyMatcher: (b) =>
                             isMatch(b, request),
                         matchResponse: {
@@ -218,7 +243,7 @@ await Promise.all(
             }
 
             export type { ${requestName}, ${responseName} };
-            export default ${oNameLower}Handler;
+            export default ${nameCamelCase}Handler;
           `;
 
           await writeFile(
@@ -226,5 +251,27 @@ await Promise.all(
             handlerOutput,
             "utf-8"
           )
-    })
+        })
+    );
+
+    const importDeclarations = `// Note: Keep explicit return type. It's something required by JSR
+    import type { HttpHandler } from "msw";
+    import type { HandlerOptions } from "./create-handler.ts";
+    ${operationDatas.map(d => 
+        `import type { ${d.requestName}, ${d.responseName} } from "./actions/${d.filename}.ts";`
+    ).join("\n")}
+    ;`
+    const typeDeclaration = `type CognitoHandlersFactory = {
+        ${operationDatas.map(({ nameCamelCase, requestName, emptyValidForResponse, responseName }) => 
+            `${nameCamelCase}Handler: (
+                request: ${requestName},
+                response${emptyValidForResponse ? "?" : ""}: ${responseName},
+                handlerOptions?: HandlerOptions,
+            ) => HttpHandler;`).join("\n")}
+    }`;
+    const exports = `export type { CognitoHandlersFactory }`;
+await writeFile(
+    path.join(srcDirpath, "cognito-handlers-factory.ts"),
+    [importDeclarations, typeDeclaration, exports].join("\n"),
+    "utf-8"
 )

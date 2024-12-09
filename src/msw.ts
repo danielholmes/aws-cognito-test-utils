@@ -1,98 +1,23 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
-import type { HttpHandler } from "msw";
-import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
+import type { BaseHandlerOptions } from "./create-handler.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
-import type {
-	ChangePasswordRequest,
-	ChangePasswordResponse,
-} from "./actions/change-password.ts";
 import changePasswordHandler from "./actions/change-password.ts";
-import type {
-	ForgotPasswordRequest,
-	ForgotPasswordResponse,
-} from "./actions/forgot-password.ts";
 import forgotPasswordHandler from "./actions/forgot-password.ts";
-import type {
-	ConfirmForgotPasswordRequest,
-	ConfirmForgotPasswordResponse,
-} from "./actions/confirm-forgot-password.ts";
 import confirmForgotPasswordHandler from "./actions/confirm-forgot-password.ts";
-import type { SignUpRequest, SignUpResponse } from "./actions/sign-up.ts";
 import signUpHandler from "./actions/sign-up.ts";
-import type {
-	ResendConfirmationCodeRequest,
-	ResendConfirmationCodeResponse,
-} from "./actions/resend-confirmation-code.ts";
 import resendConfirmationCodeHandler from "./actions/resend-confirmation-code.ts";
-import type { GetUserRequest, GetUserResponse } from "./actions/get-user.ts";
 import getUserHandler from "./actions/get-user.ts";
-import type {
-	ConfirmSignUpRequest,
-	ConfirmSignUpResponse,
-} from "./actions/confirm-sign-up.ts";
 import confirmSignUpHandler from "./actions/confirm-sign-up.ts";
-import type {
-	InitiateAuthRequest,
-	InitiateAuthResponse,
-} from "./actions/initiate-auth.ts";
 import initiateAuthHandler from "./actions/initiate-auth.ts";
+import type { CognitoHandlersFactory } from "./cognito-handlers-factory.ts";
+import setUserMFAPreferenceHandler from "./actions/set-user-mfapreference.ts";
+import associateSoftwareTokenHandler from "./actions/associate-software-token.ts";
+import respondToAuthChallengeHandler from "./actions/respond-to-auth-challenge.ts";
+import verifySoftwareTokenHandler from "./actions/verify-software-token.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
 	readonly debug?: boolean;
-};
-
-// Note: Keep explicit return type. It's something required by JSR
-type CognitoHandlersFactory = {
-	forgotPasswordHandler: (
-		request: ForgotPasswordRequest,
-		response?: ForgotPasswordResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	confirmForgotPasswordHandler: (
-		request: ConfirmForgotPasswordRequest,
-		response?: ConfirmForgotPasswordResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	changePasswordHandler: (
-		request: ChangePasswordRequest,
-		response?: ChangePasswordResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	// initiateAuthNonConfirmedUserSignInHandlers: (
-	// 	options: InitiateAuthNonConfirmedUserSignInOptions,
-	// ) => readonly HttpHandler[];
-	// initiateAuthNewPasswordRequiredHandlers: (
-	// 	options: InitiateAuthNewPasswordRequiredOptions,
-	// ) => readonly HttpHandler[];
-	// initiateAuthSuccessUserSignInHandlers: (
-	// 	options: InitiateAuthSuccessUserSignInOptions,
-	// ) => readonly HttpHandler[];
-	signUpHandler: (
-		request: SignUpRequest,
-		response: SignUpResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	confirmSignUpHandler: (
-		request: ConfirmSignUpRequest,
-		response?: ConfirmSignUpResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	getUserHandler: (
-		request: GetUserRequest,
-		response: GetUserResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	resendConfirmationCodeHandler: (
-		request: ResendConfirmationCodeRequest,
-		response?: ResendConfirmationCodeResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
-	initiateAuthHandler: (
-		request: InitiateAuthRequest,
-		response?: InitiateAuthResponse,
-		handlerOptions?: HandlerOptions,
-	) => HttpHandler;
 };
 
 function createCognitoHandlersFactory({
@@ -121,6 +46,16 @@ function createCognitoHandlersFactory({
 			resendConfirmationCodeHandler,
 			builders,
 		),
+		setUserMFAPreferenceHandler: partial(setUserMFAPreferenceHandler, builders),
+		associateSoftwareTokenHandler: partial(
+			associateSoftwareTokenHandler,
+			builders,
+		),
+		respondToAuthChallengeHandler: partial(
+			respondToAuthChallengeHandler,
+			builders,
+		),
+		verifySoftwareTokenHandler: partial(verifySoftwareTokenHandler, builders),
 	};
 }
 
