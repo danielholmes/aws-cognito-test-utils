@@ -1,5 +1,5 @@
 import type { RestHandlersFactory } from "@dhau/msw-builders";
-import type { DefaultBodyType, PathParams } from "msw";
+import type { DefaultBodyType, PathParams, RequestHandlerOptions } from "msw";
 import { HttpResponse } from "msw";
 import { isMatch } from "./utils.ts";
 
@@ -21,7 +21,7 @@ type CognitoPostOptions<
 		};
 	};
 
-type HandlerOptions = {
+type HandlerOptions = RequestHandlerOptions & {
 	readonly onCalled?: () => void;
 };
 

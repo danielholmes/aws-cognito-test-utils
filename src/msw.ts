@@ -1,5 +1,5 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
-import { HttpResponse } from "msw";
+import { HttpResponse, RequestHandlerOptions } from "msw";
 import type { BaseHandlerOptions } from "./create-handler.ts";
 import { partial, createCognitoBaseUrl } from "./utils.ts";
 import changePasswordHandler from "./actions/change-password.ts";
@@ -25,10 +25,12 @@ import {
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
 	readonly debug?: boolean;
+	readonly defaultRequestHandlerOptions?: RequestHandlerOptions;
 };
 
 function createCognitoHandlersFactory({
 	debug,
+	defaultRequestHandlerOptions,
 	...baseOptions
 }: Options): CognitoHandlersFactory {
 	// TODO: Validate user pool id format
@@ -38,6 +40,7 @@ function createCognitoHandlersFactory({
 	const builders = createRestHandlersFactory({
 		url,
 		debug,
+		defaultRequestHandlerOptions,
 	});
 	return {
 		generateUserTokens(user: User, options?: GenerateCognitoUserTokensOptions) {

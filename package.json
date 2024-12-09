@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "generate": "tsx ./scripts/generate.ts && run-s format lint"
   },
   "dependencies": {
-    "@dhau/msw-builders": "^0.0.37",
+    "@dhau/msw-builders": "^0.0.38",
     "jsonwebtoken": "^9.0.2",
     "uuid": "^11.0.3"
   },
