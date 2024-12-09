@@ -1,41 +1,41 @@
 import { createRestHandlersFactory } from "@dhau/msw-builders";
 import type { HttpHandler } from "msw";
-import type { ChangePasswordOptions } from "./change-password.ts";
-import changePasswordHandler from "./change-password.ts";
+import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
+import { partial, createCognitoBaseUrl } from "./utils.ts";
+import type {
+	ChangePasswordRequest,
+	ChangePasswordResponse,
+} from "./actions/change-password.ts";
+import changePasswordHandler from "./actions/change-password.ts";
+import type {
+	ForgotPasswordRequest,
+	ForgotPasswordResponse,
+} from "./actions/forgot-password.ts";
+import forgotPasswordHandler from "./actions/forgot-password.ts";
+import type {
+	ConfirmForgotPasswordRequest,
+	ConfirmForgotPasswordResponse,
+} from "./actions/confirm-forgot-password.ts";
+import confirmForgotPasswordHandler from "./actions/confirm-forgot-password.ts";
+import type { SignUpRequest, SignUpResponse } from "./actions/sign-up.ts";
+import signUpHandler from "./actions/sign-up.ts";
+import type {
+	ResendConfirmationCodeRequest,
+	ResendConfirmationCodeResponse,
+} from "./actions/resend-confirmation-code.ts";
+import resendConfirmationCodeHandler from "./actions/resend-confirmation-code.ts";
+import type { GetUserRequest, GetUserResponse } from "./actions/get-user.ts";
+import getUserHandler from "./actions/get-user.ts";
 import type {
 	ConfirmSignUpRequest,
 	ConfirmSignUpResponse,
-} from "./confirm-sign-up.ts";
-import confirmSignUpHandler from "./confirm-sign-up.ts";
-import type { BaseHandlerOptions, HandlerOptions } from "./create-handler.ts";
+} from "./actions/confirm-sign-up.ts";
+import confirmSignUpHandler from "./actions/confirm-sign-up.ts";
 import type {
-	InitiateAuthNewPasswordRequiredOptions,
-	InitiateAuthNonConfirmedUserSignInOptions,
 	InitiateAuthRequest,
 	InitiateAuthResponse,
-	InitiateAuthSuccessUserSignInOptions,
-} from "./initiate-auth.ts";
-import {
-	initiateAuthHandler,
-	initiateAuthNewPasswordRequiredHandlers,
-	initiateAuthNonConfirmedUserSignInHandlers,
-	initiateAuthSuccessUserSignInHandlers,
-} from "./initiate-auth.ts";
-import type { ResendConfirmationCodeOptions } from "./resend-confirmation-code.ts";
-import resendConfirmationCodeHandler from "./resend-confirmation-code.ts";
-import { partial, createCognitoBaseUrl } from "./utils.ts";
-import type { SignUpRequest, SignUpResponse } from "./sign-up.ts";
-import signUpHandler from "./sign-up.ts";
-import type { GetUserOptions } from "./get-user.ts";
-import getUserHandler from "./get-user.ts";
-import type {
-	ConfirmForgotPasswordOptions,
-	ForgotPasswordOptions,
-} from "./forgot-password.ts";
-import {
-	confirmForgotPasswordHandler,
-	forgotPasswordHandler,
-} from "./forgot-password.ts";
+} from "./actions/initiate-auth.ts";
+import initiateAuthHandler from "./actions/initiate-auth.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -45,29 +45,32 @@ type Options = BaseHandlerOptions & {
 // Note: Keep explicit return type. It's something required by JSR
 type CognitoHandlersFactory = {
 	forgotPasswordHandler: (
-		options: ForgotPasswordOptions,
+		request: ForgotPasswordRequest,
+		response?: ForgotPasswordResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	confirmForgotPasswordHandler: (
-		options: ConfirmForgotPasswordOptions,
+		request: ConfirmForgotPasswordRequest,
+		response?: ConfirmForgotPasswordResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	changePasswordHandler: (
-		options: ChangePasswordOptions,
+		request: ChangePasswordRequest,
+		response?: ChangePasswordResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
-	initiateAuthNonConfirmedUserSignInHandlers: (
-		options: InitiateAuthNonConfirmedUserSignInOptions,
-	) => readonly HttpHandler[];
-	initiateAuthNewPasswordRequiredHandlers: (
-		options: InitiateAuthNewPasswordRequiredOptions,
-	) => readonly HttpHandler[];
-	initiateAuthSuccessUserSignInHandlers: (
-		options: InitiateAuthSuccessUserSignInOptions,
-	) => readonly HttpHandler[];
+	// initiateAuthNonConfirmedUserSignInHandlers: (
+	// 	options: InitiateAuthNonConfirmedUserSignInOptions,
+	// ) => readonly HttpHandler[];
+	// initiateAuthNewPasswordRequiredHandlers: (
+	// 	options: InitiateAuthNewPasswordRequiredOptions,
+	// ) => readonly HttpHandler[];
+	// initiateAuthSuccessUserSignInHandlers: (
+	// 	options: InitiateAuthSuccessUserSignInOptions,
+	// ) => readonly HttpHandler[];
 	signUpHandler: (
 		request: SignUpRequest,
-		response?: SignUpResponse,
+		response: SignUpResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	confirmSignUpHandler: (
@@ -76,11 +79,13 @@ type CognitoHandlersFactory = {
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	getUserHandler: (
-		options: GetUserOptions,
+		request: GetUserRequest,
+		response: GetUserResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	resendConfirmationCodeHandler: (
-		options: ResendConfirmationCodeOptions,
+		request: ResendConfirmationCodeRequest,
+		response?: ResendConfirmationCodeResponse,
 		handlerOptions?: HandlerOptions,
 	) => HttpHandler;
 	initiateAuthHandler: (
@@ -108,32 +113,13 @@ function createCognitoHandlersFactory({
 			builders,
 		),
 		changePasswordHandler: partial(changePasswordHandler, builders),
-		initiateAuthNonConfirmedUserSignInHandlers: partial(
-			initiateAuthNonConfirmedUserSignInHandlers,
-			builders,
-			baseOptions,
-		),
-		initiateAuthHandler: partial(initiateAuthHandler, builders, baseOptions),
-		initiateAuthNewPasswordRequiredHandlers: partial(
-			initiateAuthNewPasswordRequiredHandlers,
-			builders,
-			baseOptions,
-		),
-		initiateAuthSuccessUserSignInHandlers: partial(
-			initiateAuthSuccessUserSignInHandlers,
-			builders,
-			{
-				...baseOptions,
-				region,
-			},
-		),
-		signUpHandler: partial(signUpHandler, builders, baseOptions),
-		confirmSignUpHandler: partial(confirmSignUpHandler, builders, baseOptions),
-		getUserHandler: partial(getUserHandler, builders, baseOptions),
+		initiateAuthHandler: partial(initiateAuthHandler, builders),
+		signUpHandler: partial(signUpHandler, builders),
+		confirmSignUpHandler: partial(confirmSignUpHandler, builders),
+		getUserHandler: partial(getUserHandler, builders),
 		resendConfirmationCodeHandler: partial(
 			resendConfirmationCodeHandler,
 			builders,
-			baseOptions,
 		),
 	};
 }

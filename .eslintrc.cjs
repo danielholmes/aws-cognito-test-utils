@@ -26,6 +26,9 @@ module.exports = {
     // Try and ensure certain deps not included
     "@typescript-eslint/consistent-type-imports": "error",
 
+    // Some cognito responses have this
+    "@typescript-eslint/no-empty-object-type": "off",
+
     // Better performance when include extensions
     "import/extensions": ["error", "ignorePackages"],
     

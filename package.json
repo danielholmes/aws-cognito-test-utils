@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -42,13 +42,17 @@
     "deploy": "run-s build publish:*",
     "test:all": "node --import tsx --test src/*.spec.ts",
     "test": "node --watch --import tsx --test src/*.spec.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate": "tsx ./scripts/generate.ts && run-s format lint"
   },
   "dependencies": {
     "@dhau/msw-builders": "^0.0.37"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
+    "@smithy/smithy-client": "^3.4.5",
+    "@smithy/types": "^3.7.1",
     "@types/node": "^22.9.1",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",

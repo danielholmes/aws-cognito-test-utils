@@ -26,12 +26,15 @@ describe("msw", () => {
 					{
 						Username: "tester@company.com",
 						Password: "Test123!",
-						UserAttributes: {
-							email: "tester@company.com",
-							"custom:account_type": "INSTITUTION",
-						},
+						UserAttributes: [
+							{
+								Name: "email",
+								Value: "tester@company.com",
+							},
+							{ Name: "custom:account_type", Value: "INSTITUTION" },
+						],
 					},
-					undefined,
+					{ UserConfirmed: true, UserSub: "user-123" },
 					{
 						onCalled() {
 							signUpCalled = true;
