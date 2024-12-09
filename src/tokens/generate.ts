@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { sign as jwtSign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { privateKey } from "./keys.ts";
 import type { UserTokens } from "./types.ts";
 
@@ -58,7 +58,7 @@ function generateCognitoUserTokens(
 		refreshTokenValidity = defaultRefreshValidity,
 	}: Options,
 	user: User,
-	userGroups: readonly string[],
+	userGroups?: readonly string[],
 ): UserTokens {
 	const eventId = uuid();
 	const authTime = Math.floor(new Date().getTime() / 1000);
@@ -94,7 +94,7 @@ function generateCognitoUserTokens(
 		),
 	};
 
-	if (userGroups.length) {
+	if (userGroups && userGroups.length > 0) {
 		accessToken["cognito:groups"] = userGroups;
 		idToken["cognito:groups"] = userGroups;
 	}
@@ -102,13 +102,13 @@ function generateCognitoUserTokens(
 	const issuer = `${issuerDomain}/${userPoolId}`;
 
 	return {
-		AccessToken: jwtSign(accessToken, privateKey.pem, {
+		AccessToken: jwt.sign(accessToken, privateKey.pem, {
 			algorithm: privateKey.jwk.alg,
 			issuer,
 			expiresIn: formatExpiration(accessTokenValidity),
 			keyid: privateKey.jwk.kid,
 		}),
-		IdToken: jwtSign(idToken, privateKey.pem, {
+		IdToken: jwt.sign(idToken, privateKey.pem, {
 			algorithm: privateKey.jwk.alg,
 			issuer,
 			expiresIn: formatExpiration(idTokenValidity),
@@ -117,7 +117,7 @@ function generateCognitoUserTokens(
 		}),
 		// this content is for debugging purposes only
 		// in reality token payload is encrypted and uses different algorithm
-		RefreshToken: jwtSign(
+		RefreshToken: jwt.sign(
 			{
 				"cognito:username": user.Username,
 				email: user.Attributes?.find((a) => a.Name === "email")?.Value,
@@ -126,7 +126,7 @@ function generateCognitoUserTokens(
 			},
 			privateKey.pem,
 			{
-				algorithm: "RS256",
+				algorithm: privateKey.jwk.alg,
 				issuer,
 				expiresIn: formatExpiration(refreshTokenValidity),
 			},
