@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -54,8 +54,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
-    "@smithy/smithy-client": "^3.4.5",
-    "@smithy/types": "^3.7.1",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.9.1",
     "@types/uuid": "^10.0.0",

@@ -319,6 +319,8 @@ await Promise.all(
 const importDeclarations = `// Note: Keep explicit return type. It's something required by JSR
     import type { HttpHandler } from "msw";
     import type { HandlerOptions } from "./create-handler.ts";
+    import type { UserTokens } from "./tokens/types.ts";
+    import type { GenerateCognitoUserTokensOptions, User } from "./tokens/generate.ts";
     ${operationDatas
 			.map(
 				(d) =>
@@ -327,6 +329,10 @@ const importDeclarations = `// Note: Keep explicit return type. It's something r
 			.join("\n")}
     ;`;
 const typeDeclaration = `type CognitoHandlersFactory = {
+		generateUserTokens(
+			user: User,
+			options?: GenerateCognitoUserTokensOptions
+		): UserTokens;
 		wellKnownJwksHandler(): HttpHandler,
         ${operationDatas
 					.map(

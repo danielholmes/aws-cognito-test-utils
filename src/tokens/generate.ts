@@ -11,6 +11,7 @@ type RawToken = Record<
 type User = {
 	readonly Username: string;
 	readonly Attributes?: readonly { Name: string; Value: string }[];
+	// userGroups?: readonly string[],
 };
 
 type ValidityUnit = "seconds" | "minutes" | "hours" | "days";
@@ -39,10 +40,13 @@ const defaultRefreshValidity = {
 	unit: "days",
 } satisfies TokenValidity;
 
-type Options = {
+type GenerateCognitoUserTokensConfig = {
 	readonly issuerDomain: string;
 	readonly userPoolId: string;
 	readonly userPoolClientId: string;
+};
+
+type GenerateCognitoUserTokensOptions = {
 	readonly idTokenValidity?: TokenValidity;
 	readonly accessTokenValidity?: TokenValidity;
 	readonly refreshTokenValidity?: TokenValidity;
@@ -53,13 +57,16 @@ function generateCognitoUserTokens(
 		issuerDomain,
 		userPoolId,
 		userPoolClientId,
-		idTokenValidity = defaultIdValidity,
-		accessTokenValidity = defaultAccessValidity,
-		refreshTokenValidity = defaultRefreshValidity,
-	}: Options,
+	}: GenerateCognitoUserTokensConfig,
 	user: User,
-	userGroups?: readonly string[],
+	options?: GenerateCognitoUserTokensOptions,
 ): UserTokens {
+	const idTokenValidity = options?.idTokenValidity ?? defaultIdValidity;
+	const accessTokenValidity =
+		options?.accessTokenValidity ?? defaultAccessValidity;
+	const refreshTokenValidity =
+		options?.refreshTokenValidity ?? defaultRefreshValidity;
+
 	const eventId = uuid();
 	const authTime = Math.floor(new Date().getTime() / 1000);
 	const sub = user.Attributes?.find((a) => a.Name === "sub")?.Value;
@@ -94,10 +101,10 @@ function generateCognitoUserTokens(
 		),
 	};
 
-	if (userGroups && userGroups.length > 0) {
-		accessToken["cognito:groups"] = userGroups;
-		idToken["cognito:groups"] = userGroups;
-	}
+	// if (userGroups && userGroups.length > 0) {
+	// 	accessToken["cognito:groups"] = userGroups;
+	// 	idToken["cognito:groups"] = userGroups;
+	// }
 
 	const issuer = `${issuerDomain}/${userPoolId}`;
 
@@ -134,4 +141,5 @@ function generateCognitoUserTokens(
 	};
 }
 
+export type { GenerateCognitoUserTokensOptions, User };
 export { generateCognitoUserTokens };

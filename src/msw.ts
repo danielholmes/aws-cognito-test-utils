@@ -16,6 +16,11 @@ import associateSoftwareTokenHandler from "./actions/associate-software-token.ts
 import respondToAuthChallengeHandler from "./actions/respond-to-auth-challenge.ts";
 import verifySoftwareTokenHandler from "./actions/verify-software-token.ts";
 import { publicKey } from "./tokens/keys.ts";
+import {
+	type GenerateCognitoUserTokensOptions,
+	type User,
+	generateCognitoUserTokens,
+} from "./tokens/generate.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -27,13 +32,25 @@ function createCognitoHandlersFactory({
 	...baseOptions
 }: Options): CognitoHandlersFactory {
 	// TODO: Validate user pool id format
-	const { userPoolId } = baseOptions;
+	const { userPoolId, userPoolClientId } = baseOptions;
 	const region = userPoolId.split("_")[0];
+	const url = createCognitoBaseUrl(region);
 	const builders = createRestHandlersFactory({
-		url: createCognitoBaseUrl(region),
+		url,
 		debug,
 	});
 	return {
+		generateUserTokens(user: User, options?: GenerateCognitoUserTokensOptions) {
+			return generateCognitoUserTokens(
+				{
+					issuerDomain: url,
+					userPoolId,
+					userPoolClientId,
+				},
+				user,
+				options,
+			);
+		},
 		forgotPasswordHandler: partial(forgotPasswordHandler, builders),
 		confirmForgotPasswordHandler: partial(
 			confirmForgotPasswordHandler,
@@ -59,7 +76,7 @@ function createCognitoHandlersFactory({
 		),
 		verifySoftwareTokenHandler: partial(verifySoftwareTokenHandler, builders),
 		wellKnownJwksHandler: () =>
-			builders.get(`/us-east-1_testaaaaa/.well-known/jwks.json`, {}, () =>
+			builders.get(`/${userPoolId}/.well-known/jwks.json`, {}, () =>
 				HttpResponse.json({
 					keys: [publicKey.jwk],
 				}),
