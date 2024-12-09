@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -22,10 +22,11 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
-    "format": "prettier -w \"src/**/*.ts\"",
+    "format": "prettier -w \"{src,scripts}/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint --ext .ts --fix ./src",
     "lint:check": "eslint --cache --cache-location ./node_modules/.cache/eslint --ext .ts ./src",

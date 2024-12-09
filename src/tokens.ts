@@ -1,16 +1,26 @@
 import { createCognitoBaseUrl } from "./utils.ts";
 
+/*
+	https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html#amazon-cognito-user-pools-using-tokens-manually-inspect
+	The signature isn't decodable base64url like the header and payload. It's an RSA256 identifier derived from a signing key 
+	and parameters that you can observe at your JWKS URI.
+	Note: Not sure what this should really be.
+ */
+const signatureComponent =
+	"M-wXAqPpRcTDgDnV6orQwtW4YASna5Ji8LZTToqXAXPXtNASo5_pP5eN5Cp1jmqt3PTGcgk6Ro9ZxxfIgcbQrhXUvlgr91YKBkc2jTap_NxBAYjvzI31khFOc9HR98CR8crv-EciNBhVcXmc7a5ghjtgNAkk7-1dcuEtJrGM6T6kxvfRL-cyDoqX9hlKmxArE-0e5eavzzcO5Oca2AN1m4gjy-Ozk8EhANdVqHyOayY44KN2wbDvDJKBKHqCAcGjn9avcM0-fBt4r7_HVG7U2DA2vDjy4Nqdy8EWjZNJnoccOQw4QRNWkQBdQQhq57cr6nYhf6cVv5MxDKmvR2CnZS";
+
 // "=" Padding is meant to be removed. See
 // https://datatracker.ietf.org/doc/html/rfc7515#section-3.2
 function encodeToken(
 	first: Record<string, unknown>,
 	second: Record<string, unknown>,
 ) {
-	return [first, second]
-		.map((c) =>
+	return [
+		...[first, second].map((c) =>
 			Buffer.from(JSON.stringify(c)).toString("base64").replace(/=/g, ""),
-		)
-		.join(".");
+		),
+		signatureComponent,
+	].join(".");
 }
 
 type UserTokens = {
