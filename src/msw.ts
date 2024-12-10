@@ -22,6 +22,11 @@ import {
 	type User,
 	generateCognitoUserTokens,
 } from "./tokens/generate.ts";
+import {
+	initiateAuthSrpNewPasswordHandlers,
+	initiateAuthSrpSuccessHandlers,
+	initiateAuthSrpTotpHandlers,
+} from "./facades/initiate-auth-srp.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -44,17 +49,7 @@ function createCognitoHandlersFactory({
 		defaultRequestHandlerOptions,
 	});
 	return {
-		generateUserTokens(user: User, options?: GenerateCognitoUserTokensOptions) {
-			return generateCognitoUserTokens(
-				{
-					issuerDomain: url,
-					userPoolId,
-					userPoolClientId,
-				},
-				user,
-				options,
-			);
-		},
+		// Actions
 		forgotPasswordHandler: partial(forgotPasswordHandler, builders),
 		confirmForgotPasswordHandler: partial(
 			confirmForgotPasswordHandler,
@@ -79,12 +74,36 @@ function createCognitoHandlersFactory({
 			builders,
 		),
 		verifySoftwareTokenHandler: partial(verifySoftwareTokenHandler, builders),
+
+		// Facades
+		initiateAuthSrpSuccessHandlers: partial(
+			initiateAuthSrpSuccessHandlers,
+			builders,
+		),
+		initiateAuthSrpTotpHandlers: partial(initiateAuthSrpTotpHandlers, builders),
+		initiateAuthSrpNewPasswordHandlers: partial(
+			initiateAuthSrpNewPasswordHandlers,
+			builders,
+		),
+
+		// Misc
 		wellKnownJwksHandler: () =>
 			builders.get(`/${userPoolId}/.well-known/jwks.json`, {}, () =>
 				HttpResponse.json({
 					keys: [publicKey.jwk],
 				}),
 			),
+		generateUserTokens(user: User, options?: GenerateCognitoUserTokensOptions) {
+			return generateCognitoUserTokens(
+				{
+					issuerDomain: url,
+					userPoolId,
+					userPoolClientId,
+				},
+				user,
+				options,
+			);
+		},
 	};
 }
 

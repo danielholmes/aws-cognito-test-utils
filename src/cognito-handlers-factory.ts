@@ -7,6 +7,11 @@ import type {
 	User,
 } from "./tokens/generate.ts";
 import type {
+	InitiateAuthSrpSuccessOptions,
+	InitiateAuthSrpNewPasswordOptions,
+	InitiateAuthSrpTotpOptions,
+} from "./facades/initiate-auth-srp.ts";
+import type {
 	ChangePasswordRequest,
 	ChangePasswordResponse,
 } from "./actions/change-password.ts";
@@ -54,6 +59,17 @@ type CognitoHandlersFactory = {
 		options?: GenerateCognitoUserTokensOptions,
 	): UserTokens;
 	wellKnownJwksHandler(): HttpHandler;
+
+	initiateAuthSrpSuccessHandlers(
+		options: InitiateAuthSrpSuccessOptions,
+	): readonly HttpHandler[];
+	initiateAuthSrpTotpHandlers(
+		options: InitiateAuthSrpTotpOptions,
+	): readonly HttpHandler[];
+	initiateAuthSrpNewPasswordHandlers(
+		options: InitiateAuthSrpNewPasswordOptions,
+	): readonly HttpHandler[];
+
 	changePasswordHandler(
 		request: ChangePasswordRequest,
 		response?: ChangePasswordResponse,
