@@ -48,15 +48,18 @@ function baseInitiateAuthSrpHandlers(
 	];
 }
 
-type InitiateAuthSrpTotpOptions = BaseInitiateAuthSrpOptions;
+type InitiateAuthSrpTotpOptions = BaseInitiateAuthSrpOptions & {
+	readonly responseSession: string;
+};
 
 function initiateAuthSrpTotpHandlers(
 	factory: RestHandlersFactory,
-	options: InitiateAuthSrpTotpOptions,
+	{ responseSession, ...options }: InitiateAuthSrpTotpOptions,
 ) {
 	return baseInitiateAuthSrpHandlers(factory, options, {
 		ChallengeName: "SOFTWARE_TOKEN_MFA",
 		ChallengeParameters: {},
+		Session: responseSession,
 	});
 }
 
