@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -35,19 +35,20 @@
     "publint:check": "publint",
     "attw:check": "attw --pack .",
     "versions:check": "[ $(jq .version package.json) = $(jq .version jsr.json) ];",
-    "prebuild": "run-p format:check lint:check test:all jsr:check versions:check",
+    "prebuild": "run-p format:check lint:check test:coverage jsr:check versions:check",
     "build": "tsup",
     "postbuild": "run-p publint:check attw:check",
     "publish:npm": "npm publish --access public --provenance",
     "publish:jsr": "jsr publish",
     "deploy": "run-s build publish:*",
-    "test:all": "node --import tsx --test src/*.spec.ts",
     "test": "node --watch --import tsx --test src/*.spec.ts",
+    "test:all": "node --import tsx --test src/*.spec.ts",
+    "test:coverage": "node --experimental-test-coverage --import tsx --test src/*.spec.ts",
     "prepare": "husky",
     "generate": "tsx ./scripts/generate.ts && run-s format lint"
   },
   "dependencies": {
-    "@dhau/msw-builders": "^0.0.39",
+    "@dhau/msw-builders": "^0.0.40",
     "jsonwebtoken": "^9.0.2",
     "uuid": "^11.0.3"
   },
