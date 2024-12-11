@@ -24,6 +24,7 @@ import {
 } from "./tokens/generate.ts";
 import {
 	initiateAuthSrpNewPasswordHandlers,
+	initiateAuthSrpNonConfirmedHandlers,
 	initiateAuthSrpSuccessHandlers,
 	initiateAuthSrpTotpHandlers,
 } from "./facades/initiate-auth-srp.ts";
@@ -88,6 +89,10 @@ function createCognitoHandlersFactory({
 		initiateAuthSrpTotpHandlers: partial(initiateAuthSrpTotpHandlers, builders),
 		initiateAuthSrpNewPasswordHandlers: partial(
 			initiateAuthSrpNewPasswordHandlers,
+			builders,
+		),
+		initiateAuthSrpNonConfirmedHandlers: partial(
+			initiateAuthSrpNonConfirmedHandlers,
 			builders,
 		),
 

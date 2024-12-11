@@ -59,6 +59,14 @@ module.exports = {
     // Triggering for describe, etc in tests
     "@typescript-eslint/no-floating-promises": "off",
 
+    // Want to allow destructuring
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true
+      }
+    ],
+
     // Too strict atm, giving too many errors
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",

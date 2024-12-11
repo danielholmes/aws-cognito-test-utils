@@ -7,6 +7,7 @@ import type {
 	User,
 } from "./tokens/generate.ts";
 import type {
+	InitiateAuthSrpNonConfirmedOptions,
 	InitiateAuthSrpSuccessOptions,
 	InitiateAuthSrpNewPasswordOptions,
 	InitiateAuthSrpTotpOptions,
@@ -68,6 +69,9 @@ type CognitoHandlersFactory = {
 	): readonly HttpHandler[];
 	initiateAuthSrpNewPasswordHandlers(
 		options: InitiateAuthSrpNewPasswordOptions,
+	): readonly HttpHandler[];
+	initiateAuthSrpNonConfirmedHandlers(
+		options: InitiateAuthSrpNonConfirmedOptions,
 	): readonly HttpHandler[];
 
 	changePasswordHandler(

@@ -321,7 +321,7 @@ const importDeclarations = `// Note: Keep explicit return type. It's something r
     import type { HandlerOptions } from "./create-handler.ts";
     import type { UserTokens } from "./tokens/types.ts";
     import type { GenerateCognitoUserTokensOptions, User } from "./tokens/generate.ts";
-	import type { InitiateAuthSrpSuccessOptions, InitiateAuthSrpNewPasswordOptions, InitiateAuthSrpTotpOptions } from "./facades/initiate-auth-srp.ts";
+	import type { InitiateAuthSrpNonConfirmedOptions, InitiateAuthSrpSuccessOptions, InitiateAuthSrpNewPasswordOptions, InitiateAuthSrpTotpOptions } from "./facades/initiate-auth-srp.ts";
     ${operationDatas
 			.map(
 				(d) =>
@@ -340,6 +340,7 @@ const typeDeclaration = `type CognitoHandlersFactory = {
 		initiateAuthSrpSuccessHandlers(options: InitiateAuthSrpSuccessOptions): readonly HttpHandler[],
 		initiateAuthSrpTotpHandlers(options: InitiateAuthSrpTotpOptions): readonly HttpHandler[],
 		initiateAuthSrpNewPasswordHandlers(options: InitiateAuthSrpNewPasswordOptions): readonly HttpHandler[],
+		initiateAuthSrpNonConfirmedHandlers(options: InitiateAuthSrpNonConfirmedOptions): readonly HttpHandler[],
 
         ${operationDatas
 					.map(
