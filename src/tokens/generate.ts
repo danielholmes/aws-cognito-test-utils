@@ -141,5 +141,9 @@ function generateCognitoUserTokens(
 	};
 }
 
-export type { GenerateCognitoUserTokensOptions, User };
+export type {
+	GenerateCognitoUserTokensOptions,
+	GenerateCognitoUserTokensConfig,
+	User,
+};
 export { generateCognitoUserTokens };

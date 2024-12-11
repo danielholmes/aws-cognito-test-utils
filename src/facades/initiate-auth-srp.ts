@@ -3,15 +3,20 @@ import initiateAuthHandler from "../actions/initiate-auth.ts";
 import type { RespondToAuthChallengeResponse } from "../actions/respond-to-auth-challenge.ts";
 import respondToAuthChallengeHandler from "../actions/respond-to-auth-challenge.ts";
 import type { UserTokens } from "../tokens/types.ts";
+import {
+	type GenerateCognitoUserTokensConfig,
+	generateCognitoUserTokens,
+} from "../tokens/generate.ts";
 
 type BaseInitiateAuthSrpOptions = {
 	readonly username: string;
 	readonly userId: string;
+	readonly onCalled?: () => void;
 };
 
 function baseInitiateAuthSrpHandlers(
 	factory: RestHandlersFactory,
-	{ username, userId }: BaseInitiateAuthSrpOptions,
+	{ username, userId, onCalled }: BaseInitiateAuthSrpOptions,
 	response: RespondToAuthChallengeResponse,
 ) {
 	return [
@@ -44,6 +49,9 @@ function baseInitiateAuthSrpHandlers(
 				},
 			},
 			response,
+			{
+				onCalled,
+			},
 		),
 	];
 }
@@ -64,16 +72,20 @@ function initiateAuthSrpTotpHandlers(
 }
 
 type InitiateAuthSrpSuccessOptions = BaseInitiateAuthSrpOptions & {
-	readonly tokens: UserTokens;
+	readonly tokens?: UserTokens;
 };
 
 function initiateAuthSrpSuccessHandlers(
 	factory: RestHandlersFactory,
+	generateOptions: GenerateCognitoUserTokensConfig,
 	{ tokens, ...options }: InitiateAuthSrpSuccessOptions,
 ) {
 	return baseInitiateAuthSrpHandlers(factory, options, {
 		AuthenticationResult: {
-			...tokens,
+			...(tokens ??
+				generateCognitoUserTokens(generateOptions, {
+					Username: options.username,
+				})),
 			TokenType: "Bearer",
 		},
 		ChallengeParameters: {},

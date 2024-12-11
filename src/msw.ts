@@ -79,6 +79,11 @@ function createCognitoHandlersFactory({
 		initiateAuthSrpSuccessHandlers: partial(
 			initiateAuthSrpSuccessHandlers,
 			builders,
+			{
+				issuerDomain: url,
+				userPoolId,
+				userPoolClientId,
+			},
 		),
 		initiateAuthSrpTotpHandlers: partial(initiateAuthSrpTotpHandlers, builders),
 		initiateAuthSrpNewPasswordHandlers: partial(
