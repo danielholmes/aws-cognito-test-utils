@@ -111,10 +111,10 @@ function initiateAuthSrpNewPasswordHandlers(
 ) {
 	return baseInitiateAuthSrpHandlers(factory, options, {
 		ChallengeName: "NEW_PASSWORD_REQUIRED",
+		Session: responseSession,
 		ChallengeParameters: {
 			requiredAttributes: "[]",
 			userAttributes: JSON.stringify(userAttributes),
-			Session: responseSession,
 		},
 	});
 }
