@@ -1,6 +1,6 @@
 {
   "name": "@dhau/aws-cognito-test-utils",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "type": "module",
   "author": "Daniel Holmes",
   "license": "MIT",
@@ -72,7 +72,7 @@
     "msw": "^2.1.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
-    "publint": "^0.2.8",
+    "publint": "^0.3.2",
     "tsup": "^8.1.0",
     "tsx": "^4.9.3",
     "typescript": "^5.2.2"

@@ -19,6 +19,19 @@ const operations = [
 		name: "GetUser",
 	},
 	{
+		name: "AdminGetUser",
+	},
+	{
+		name: "AdminSetUserPassword",
+	},
+	{
+		name: "AdminDeleteUser",
+		noResponse: true,
+	},
+	{
+		name: "ListUsers",
+	},
+	{
 		name: "ResendConfirmationCode",
 	},
 	{
@@ -78,6 +91,11 @@ type NodeInfo = {
 };
 
 async function findInterfacesOrTypesByName(name: string) {
+	// Some typing in js lib which isn't exact match for underlying api
+	if (name === "Date") {
+		return [];
+	}
+
 	let results: NodeInfo[] = [];
 	for (const nodes of modelFiles) {
 		for (const source of nodes) {
@@ -204,6 +222,21 @@ async function findInterfaceOrTypeAndLinkedTypesByName(
 	).flat();
 }
 
+function createHandlerArgs({
+	requestName,
+	responseName,
+	emptyValidForResponse,
+}) {
+	return [
+		"factory: RestHandlersFactory",
+		`request: ${requestName}`,
+		responseName
+			? `response${emptyValidForResponse ? "?" : ""}: ${responseName}`
+			: undefined,
+		"handlerOptions?: HandlerOptions",
+	].filter(Boolean);
+}
+
 const operationDatas = await Promise.all(
 	operations.map(async (o) => {
 		const filename = o.name
@@ -212,18 +245,19 @@ const operationDatas = await Promise.all(
 
 		// Find model types
 		const requestName = `${o.name}Request`;
-		const responseName = `${o.name}Response`;
+		const responseName = o.noResponse ? undefined : `${o.name}Response`;
 		const [requestAsts, responseAsts] = await Promise.all([
 			findInterfaceOrTypeAndLinkedTypesByName(requestName),
-			findInterfaceOrTypeAndLinkedTypesByName(responseName),
+			responseName ? findInterfaceOrTypeAndLinkedTypesByName(responseName) : [],
 		]);
-		const { node: responseAst } = responseAsts[0];
-		if (!ts.isInterfaceDeclaration(responseAst)) {
-			throw new Error("Response is not an interface");
+		let emptyValidForResponse = true;
+		if (responseAsts.length > 0) {
+			const { node: responseAst } = responseAsts[0];
+			if (!ts.isInterfaceDeclaration(responseAst)) {
+				throw new Error("Response is not an interface");
+			}
+			emptyValidForResponse = responseAst.members.every((m) => m.questionToken);
 		}
-		const emptyValidForResponse = responseAst.members.every(
-			(m) => m.questionToken,
-		);
 		const structAsts = [...requestAsts, ...responseAsts]
 			.reduce(
 				(accu, a) => {
@@ -250,8 +284,8 @@ const operationDatas = await Promise.all(
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 await Promise.all(
-	operationDatas.map(
-		async ({
+	operationDatas.map(async (operationData) => {
+		const {
 			name,
 			nameCamelCase,
 			filename,
@@ -259,22 +293,24 @@ await Promise.all(
 			structAsts,
 			requestName,
 			responseName,
-		}) => {
-			const sourceFile = ts.createSourceFile(
-				`${filename}.ts`,
-				"",
-				ts.ScriptTarget.Latest,
-				false,
-				ts.ScriptKind.TS,
-			);
-			const structsOutput = printer.printList(
-				ts.ListFormat.MultiLine,
-				factory.createNodeArray(structAsts),
-				sourceFile,
-			);
+		} = operationData;
+		const sourceFile = ts.createSourceFile(
+			`${filename}.ts`,
+			"",
+			ts.ScriptTarget.Latest,
+			false,
+			ts.ScriptKind.TS,
+		);
+		const structsOutput = printer.printList(
+			ts.ListFormat.MultiLine,
+			factory.createNodeArray(structAsts),
+			sourceFile,
+		);
 
-			console.log("TODO: Check ClientId and/or UserPoolId on request matches");
-			const handlerOutput = `
+		const handlerArgs = createHandlerArgs(operationData);
+
+		console.log("TODO: Check ClientId and/or UserPoolId on request matches");
+		const handlerOutput = `
             import type { RestHandlersFactory } from "@dhau/msw-builders";
             import { isMatch } from "../utils.ts";
             import type { HandlerOptions } from "../create-handler.ts";
@@ -283,10 +319,7 @@ await Promise.all(
             ${structsOutput}
 
             function ${nameCamelCase}Handler(
-                factory: RestHandlersFactory,
-                request: ${requestName},
-                response${emptyValidForResponse ? "?" : ""}: ${responseName},
-                handlerOptions?: HandlerOptions,
+                ${handlerArgs.join(", ")}
             ) {
                 return createCognitoPostHandler(
                     factory,
@@ -296,24 +329,29 @@ await Promise.all(
                             isMatch(b, request),
                         matchResponse: {
                             status: 200,
-                            body: ${emptyValidForResponse ? `(response ?? {}) satisfies ${responseName}` : "response"},
+                            body: ${
+															responseName
+																? emptyValidForResponse
+																	? `(response ?? {}) satisfies ${responseName}`
+																	: "response"
+																: "undefined"
+														},
                         },
                     },
                     handlerOptions,
                 );
             }
 
-            export type { ${requestName}, ${responseName} };
+            export type { ${requestName} ${responseName ? `,${responseName}` : ""} };
             export default ${nameCamelCase}Handler;
           `;
 
-			await writeFile(
-				path.join(actionsDirpath, sourceFile.fileName),
-				handlerOutput,
-				"utf-8",
-			);
-		},
-	),
+		await writeFile(
+			path.join(actionsDirpath, sourceFile.fileName),
+			handlerOutput,
+			"utf-8",
+		);
+	}),
 );
 
 const importDeclarations = `// Note: Keep explicit return type. It's something required by JSR
@@ -325,7 +363,7 @@ const importDeclarations = `// Note: Keep explicit return type. It's something r
     ${operationDatas
 			.map(
 				(d) =>
-					`import type { ${d.requestName}, ${d.responseName} } from "./actions/${d.filename}.ts";`,
+					`import type { ${d.requestName} ${d.responseName ? `,${d.responseName}` : ""} } from "./actions/${d.filename}.ts";`,
 			)
 			.join("\n")}
     ;
@@ -352,7 +390,7 @@ const typeDeclaration = `type CognitoHandlersFactory = {
 						}) =>
 							`${nameCamelCase}Handler(
                 request: ${requestName},
-                response${emptyValidForResponse ? "?" : ""}: ${responseName},
+                ${responseName ? `response${emptyValidForResponse ? "?" : ""}: ${responseName},` : ""}
                 handlerOptions?: HandlerOptions,
             ): HttpHandler;`,
 					)

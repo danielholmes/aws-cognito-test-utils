@@ -30,6 +30,19 @@ import type {
 } from "./actions/confirm-sign-up.ts";
 import type { GetUserRequest, GetUserResponse } from "./actions/get-user.ts";
 import type {
+	AdminGetUserRequest,
+	AdminGetUserResponse,
+} from "./actions/admin-get-user.ts";
+import type {
+	AdminSetUserPasswordRequest,
+	AdminSetUserPasswordResponse,
+} from "./actions/admin-set-user-password.ts";
+import type { AdminDeleteUserRequest } from "./actions/admin-delete-user.ts";
+import type {
+	ListUsersRequest,
+	ListUsersResponse,
+} from "./actions/list-users.ts";
+import type {
 	ResendConfirmationCodeRequest,
 	ResendConfirmationCodeResponse,
 } from "./actions/resend-confirmation-code.ts";
@@ -97,6 +110,26 @@ type CognitoHandlersFactory = {
 	getUserHandler(
 		request: GetUserRequest,
 		response: GetUserResponse,
+		handlerOptions?: HandlerOptions,
+	): HttpHandler;
+	adminGetUserHandler(
+		request: AdminGetUserRequest,
+		response: AdminGetUserResponse,
+		handlerOptions?: HandlerOptions,
+	): HttpHandler;
+	adminSetUserPasswordHandler(
+		request: AdminSetUserPasswordRequest,
+		response?: AdminSetUserPasswordResponse,
+		handlerOptions?: HandlerOptions,
+	): HttpHandler;
+	adminDeleteUserHandler(
+		request: AdminDeleteUserRequest,
+
+		handlerOptions?: HandlerOptions,
+	): HttpHandler;
+	listUsersHandler(
+		request: ListUsersRequest,
+		response?: ListUsersResponse,
 		handlerOptions?: HandlerOptions,
 	): HttpHandler;
 	resendConfirmationCodeHandler(

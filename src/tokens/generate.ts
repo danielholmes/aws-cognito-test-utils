@@ -16,7 +16,10 @@ type User = {
 
 type ValidityUnit = "seconds" | "minutes" | "hours" | "days";
 
-function formatExpiration({ duration, unit }: TokenValidity): string {
+function formatExpiration({
+	duration,
+	unit,
+}: TokenValidity): `${number}${ValidityUnit}` {
 	return `${duration}${unit}`;
 }
 

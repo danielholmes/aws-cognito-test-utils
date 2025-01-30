@@ -28,6 +28,10 @@ import {
 	initiateAuthSrpSuccessHandlers,
 	initiateAuthSrpTotpHandlers,
 } from "./facades/initiate-auth-srp.ts";
+import adminGetUserHandler from "./actions/admin-get-user.ts";
+import listUsersHandler from "./actions/list-users.ts";
+import adminSetUserPasswordHandler from "./actions/admin-set-user-password.ts";
+import adminDeleteUserHandler from "./actions/admin-delete-user.ts";
 
 type Options = BaseHandlerOptions & {
 	readonly userPoolId: string;
@@ -75,6 +79,10 @@ function createCognitoHandlersFactory({
 			builders,
 		),
 		verifySoftwareTokenHandler: partial(verifySoftwareTokenHandler, builders),
+		adminGetUserHandler: partial(adminGetUserHandler, builders),
+		listUsersHandler: partial(listUsersHandler, builders),
+		adminSetUserPasswordHandler: partial(adminSetUserPasswordHandler, builders),
+		adminDeleteUserHandler: partial(adminDeleteUserHandler, builders),
 
 		// Facades
 		initiateAuthSrpSuccessHandlers: partial(
