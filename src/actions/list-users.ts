@@ -17,8 +17,8 @@ type ListUsersResponse = {
 type UserType = {
 	Username?: string | undefined;
 	Attributes?: AttributeType[] | undefined;
-	UserCreateDate?: Date | undefined;
-	UserLastModifiedDate?: Date | undefined;
+	UserCreateDate?: number | undefined;
+	UserLastModifiedDate?: number | undefined;
 	Enabled?: boolean | undefined;
 	UserStatus?: UserStatusType | undefined;
 	MFAOptions?: MFAOptionType[] | undefined;

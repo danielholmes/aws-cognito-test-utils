@@ -237,6 +237,53 @@ function createHandlerArgs({
 	].filter(Boolean);
 }
 
+function updateDateTypes(context: ts.TransformationContext) {
+	return (rootNode: ts.Node): ts.Node => {
+		function visitor(node: ts.Node): ts.Node {
+			// Check if the node is a property signature
+			if (ts.isPropertySignature(node) && node.type) {
+				let newType: ts.TypeNode | undefined = undefined;
+
+				// Handle union types (e.g., Date | undefined)
+				if (ts.isUnionTypeNode(node.type)) {
+					const updatedTypes = node.type.types.map((t) =>
+						ts.isTypeReferenceNode(t) &&
+						ts.isIdentifier(t.typeName) &&
+						t.typeName.escapedText === "Date"
+							? ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
+							: t,
+					);
+					newType = ts.factory.createUnionTypeNode(updatedTypes);
+				}
+				// Handle direct "Date" types
+				else if (
+					ts.isTypeReferenceNode(node.type) &&
+					node.type.typeName.getText() === "Date"
+				) {
+					newType = ts.factory.createKeywordTypeNode(
+						ts.SyntaxKind.NumberKeyword,
+					);
+				}
+
+				// If the type was updated, return a modified property signature
+				if (newType) {
+					return ts.factory.updatePropertySignature(
+						node,
+						node.modifiers,
+						node.name,
+						node.questionToken,
+						newType,
+					);
+				}
+			}
+
+			return ts.visitEachChild(node, visitor, context);
+		}
+
+		return ts.visitNode(rootNode, visitor);
+	};
+}
+
 const operationDatas = await Promise.all(
 	operations.map(async (o) => {
 		const filename = o.name
@@ -290,7 +337,7 @@ await Promise.all(
 			nameCamelCase,
 			filename,
 			emptyValidForResponse,
-			structAsts,
+			structAsts: rawStructAsts,
 			requestName,
 			responseName,
 		} = operationData;
@@ -301,6 +348,17 @@ await Promise.all(
 			false,
 			ts.ScriptKind.TS,
 		);
+
+		const structAsts = rawStructAsts.map((s) => {
+			const tempFile = ts.createSourceFile(
+				"temp.ts",
+				printer.printNode(ts.EmitHint.Unspecified, s, sourceFile),
+				ts.ScriptTarget.Latest,
+				false,
+				ts.ScriptKind.TS,
+			);
+			return ts.transform(tempFile, [updateDateTypes]).transformed[0];
+		});
 		const structsOutput = printer.printList(
 			ts.ListFormat.MultiLine,
 			factory.createNodeArray(structAsts),
