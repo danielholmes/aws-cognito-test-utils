@@ -49,10 +49,17 @@ type GenerateCognitoUserTokensConfig = {
 	readonly userPoolClientId: string;
 };
 
+type GenerateTokenOptions = {
+	readonly eventId?: string;
+	readonly jti?: string;
+	readonly expiresIn?: TokenValidity;
+};
+
 type GenerateCognitoUserTokensOptions = {
-	readonly idTokenValidity?: TokenValidity;
-	readonly accessTokenValidity?: TokenValidity;
-	readonly refreshTokenValidity?: TokenValidity;
+	readonly authTime?: number;
+	readonly idToken?: GenerateTokenOptions;
+	readonly accessToken?: GenerateTokenOptions;
+	readonly refreshToken?: GenerateTokenOptions;
 };
 
 function generateCognitoUserTokens(
@@ -64,26 +71,33 @@ function generateCognitoUserTokens(
 	user: User,
 	options?: GenerateCognitoUserTokensOptions,
 ): UserTokens {
-	const idTokenValidity = options?.idTokenValidity ?? defaultIdValidity;
-	const accessTokenValidity =
-		options?.accessTokenValidity ?? defaultAccessValidity;
-	const refreshTokenValidity =
-		options?.refreshTokenValidity ?? defaultRefreshValidity;
-
-	const eventId = uuid();
-	const authTime = Math.floor(new Date().getTime() / 1000);
+	const defaultEventId = uuid();
+	const authTime = options?.authTime ?? Math.floor(new Date().getTime() / 1000);
 	const sub = user.Attributes?.find((a) => a.Name === "sub")?.Value;
 
+	const accessOptions = {
+		eventId: defaultEventId,
+		jti: uuid(),
+		expiresIn: defaultAccessValidity,
+		...options?.accessToken,
+	};
 	const accessToken: RawToken = {
 		auth_time: authTime,
 		client_id: userPoolClientId,
-		event_id: eventId,
+		event_id: accessOptions.eventId,
 		iat: authTime,
-		jti: uuid(),
+		jti: accessOptions.jti,
 		scope: "aws.cognito.signin.user.admin", // TODO: scopes
 		sub,
 		token_use: "access",
 		username: user.Username,
+	};
+
+	const idOptions = {
+		eventId: defaultEventId,
+		jti: uuid(),
+		expiresIn: defaultIdValidity,
+		...options?.idToken,
 	};
 	const idToken: RawToken = {
 		"cognito:username": user.Username,
@@ -92,9 +106,9 @@ function generateCognitoUserTokens(
 		email_verified: Boolean(
 			user.Attributes?.find((a) => a.Name === "email_verified")?.Value ?? false,
 		),
-		event_id: eventId,
+		event_id: idOptions.eventId,
 		iat: authTime,
-		jti: uuid(),
+		jti: idOptions.jti,
 		sub,
 		token_use: "id",
 		...Object.fromEntries(
@@ -104,10 +118,18 @@ function generateCognitoUserTokens(
 		),
 	};
 
-	// if (userGroups && userGroups.length > 0) {
-	// 	accessToken["cognito:groups"] = userGroups;
-	// 	idToken["cognito:groups"] = userGroups;
-	// }
+	const refreshOptions = {
+		jti: uuid(),
+		expiresIn: defaultRefreshValidity,
+		...options?.idToken,
+	};
+	const refreshToken = {
+		"cognito:username": user.Username,
+		email: user.Attributes?.find((a) => a.Name === "email")?.Value,
+		iat: authTime,
+		expiresIn: formatExpiration(refreshOptions.expiresIn),
+		jti: refreshOptions.jti,
+	};
 
 	const issuer = `${issuerDomain}/${userPoolId}`;
 
@@ -115,32 +137,23 @@ function generateCognitoUserTokens(
 		AccessToken: jwt.sign(accessToken, privateKey.pem, {
 			algorithm: privateKey.jwk.alg,
 			issuer,
-			expiresIn: formatExpiration(accessTokenValidity),
+			expiresIn: formatExpiration(accessOptions.expiresIn),
 			keyid: privateKey.jwk.kid,
 		}),
 		IdToken: jwt.sign(idToken, privateKey.pem, {
 			algorithm: privateKey.jwk.alg,
 			issuer,
-			expiresIn: formatExpiration(idTokenValidity),
+			expiresIn: formatExpiration(idOptions.expiresIn),
 			audience: userPoolClientId,
 			keyid: privateKey.jwk.kid,
 		}),
 		// this content is for debugging purposes only
 		// in reality token payload is encrypted and uses different algorithm
-		RefreshToken: jwt.sign(
-			{
-				"cognito:username": user.Username,
-				email: user.Attributes?.find((a) => a.Name === "email")?.Value,
-				iat: authTime,
-				jti: uuid(),
-			},
-			privateKey.pem,
-			{
-				algorithm: privateKey.jwk.alg,
-				issuer,
-				expiresIn: formatExpiration(refreshTokenValidity),
-			},
-		),
+		RefreshToken: jwt.sign(refreshToken, privateKey.pem, {
+			algorithm: privateKey.jwk.alg,
+			issuer,
+			expiresIn: formatExpiration(refreshOptions.expiresIn),
+		}),
 	};
 }
 
